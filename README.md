@@ -1,10 +1,10 @@
-# SIGECEM - Sistema de Gerenciamento de Cestas Básicas [cite: 5]
+# SIGECEM - Sistema de Gerenciamento de Cestas Básicas
 
 Este é um projeto acadêmico da disciplina de Engenharia de Software, com o objetivo de informatizar e otimizar o processo de controle de estoque de cestas básicas da ONG SEM FOME.
 
 O sistema é uma aplicação Web Full-Stack, utilizando **React.js** para o front-end e **Node.js/Express** com **MySQL** para o back-end.
 
-## 🚀 Principais Funcionalidades (Escopo)
+## 🚀 Principais Funcionalidades
 
 O sistema permitirá o gerenciamento completo do fluxo de doações:
 
@@ -14,61 +14,6 @@ O sistema permitirá o gerenciamento completo do fluxo de doações:
 - Controle de Estoque de Produtos e Categorias
 - Registro de Entradas (Doações)
 - Registro de Saídas (Distribuição de Cestas)
-
-## 🛠️ Tecnologias Utilizadas
-
-- **Front-end:** React.js
-- **Back-end:** Node.js, Express.js
-- **Banco de Dados:** MySQL
-- **Gerenciamento de Pacotes:** NPM
-- **Controle de Versão:** Git e GitHub
-
-## ⚙️ Configuração do Ambiente de Desenvolvimento (Local)
-
-Siga estes passos para configurar e executar o projeto em sua máquina local.
-
-### Pré-requisitos
-
-Antes de começar, certifique-se de que você tem os seguintes softwares instalados:
-
-- [Git](https://git-scm.com/)
-- [Node.js (v18 ou superior)](https://nodejs.org/)
-- Um servidor MySQL local (Recomendamos [MySQL Community Server](https://dev.mysql.com/downloads/mysql/))
-- Um cliente de Banco de Dados (Recomendamos [MySQL Workbench](https://dev.mysql.com/downloads/workbench/) ou DBeaver)
-
-### 1. Clonando o Repositório
-
-Primeiro, clone o repositório do GitHub para sua máquina:
-
-```bash
-git clone [https://github.com/Stuutis/SIGECEM.git](https://github.com/Stuutis/SIGECEM.git)
-cd SIGECEM
-```
-
-Claro! Um bom README.md é essencial para o seu projeto. Ele é o "portão de entrada" para qualquer pessoa que queira entender ou colaborar (incluindo seu professor e colegas).
-
-Este README.md deve ser criado na pasta raiz do seu projeto (na pasta SIGECEM, ao lado da pasta backend e dos arquivos do front-end).
-
-Crie um arquivo chamado README.md e cole o texto abaixo dentro dele.
-
-Markdown
-
-# [cite_start]SIGECEM - Sistema de Gerenciamento de Cestas Básicas [cite: 5]
-
-[cite_start]Este é um projeto acadêmico da disciplina de Engenharia de Software [cite: 3][cite_start], com o objetivo de informatizar e otimizar o processo de controle de estoque de cestas básicas da ONG SEM FOME[cite: 16].
-
-O sistema é uma aplicação Web Full-Stack, utilizando **React.js** para o front-end e **Node.js/Express** com **MySQL** para o back-end.
-
-## 🚀 Principais Funcionalidades (Escopo)
-
-O sistema permitirá o gerenciamento completo do fluxo de doações:
-
-- [cite_start]Gerenciamento de Doadores (Pessoas Físicas e Jurídicas) [cite: 23]
-- [cite_start]Gerenciamento de Famílias Beneficiadas [cite: 24]
-- [cite_start]Gerenciamento de Voluntários e Funcionários [cite: 29]
-- [cite_start]Controle de Estoque de Produtos e Categorias [cite: 26, 27]
-- [cite_start]Registro de Entradas (Doações) [cite: 25]
-- [cite_start]Registro de Saídas (Distribuição de Cestas) [cite: 28]
 
 ## 🛠️ Tecnologias Utilizadas
 
