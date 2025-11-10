@@ -1,6 +1,6 @@
-# SIGECEM - Sistema de Gerenciamento de Cestas Básicas [cite: 5]
+# SIGECEM - Sistema de Gerenciamento de Cestas Básicas
 
-]Este é um projeto acadêmico da disciplina de Engenharia de Software, com o objetivo de informatizar e otimizar o processo de controle de estoque de cestas básicas da ONG SEM FOME.
+Este é um projeto acadêmico da disciplina de Engenharia de Software, com o objetivo de informatizar e otimizar o processo de controle de estoque de cestas básicas da ONG SEM FOME.
 
 O sistema é uma aplicação Web Full-Stack, utilizando **React.js** para o front-end e **Node.js/Express** com **MySQL** para o back-end.
 
