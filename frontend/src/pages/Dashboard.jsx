@@ -4,19 +4,19 @@ export default function Dashboard() {
       <h1>Dashboard</h1>
 
       <div className="cards-container">
-        <div className="card">
-          <h2>Doadores</h2>
-          <p>124 cadastrados</p>
+        <div className="card azul-escuro">
+          <h2>Total de Doações</h2>
+          <p>1,200</p>
         </div>
 
-        <div className="card">
-          <h2>Famílias</h2>
-          <p>87 ativas</p>
+        <div className="card verde">
+          <h2>Estoque Disponível</h2>
+          <p>3,500</p>
         </div>
 
-        <div className="card">
-          <h2>Estoque</h2>
-          <p>342 itens</p>
+        <div className="card azul-claro">
+          <h2>Famílias Beneficiadas</h2>
+          <p>300</p>
         </div>
       </div>
     </div>
