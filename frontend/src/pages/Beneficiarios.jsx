@@ -11,7 +11,7 @@ function Form({ initial = {}, onCancel, onSave }) {
 
   function change(e) {
     const { name, value } = e.target;
-    setForm(prev => ({ ...prev, [name]: value }));
+    setForm((prev) => ({ ...prev, [name]: value }));
   }
 
   function submit(e) {
@@ -23,21 +23,35 @@ function Form({ initial = {}, onCancel, onSave }) {
     <div className="modal">
       <form className="modal-card" onSubmit={submit}>
         <h3>{initial.id ? "Editar beneficiário" : "Novo beneficiário"}</h3>
-        <label>Nome
-          <input name="nome" value={form.nome || ""} onChange={change} required />
+        <label>
+          Nome
+          <input
+            name="nome"
+            value={form.nome || ""}
+            onChange={change}
+            required
+          />
         </label>
-        <label>CPF
+        <label>
+          CPF
           <input name="cpf" value={form.cpf || ""} onChange={change} />
         </label>
-        <label>Status
-          <select name="status" value={form.status || "Ativa"} onChange={change}>
+        <label>
+          Status
+          <select
+            name="status"
+            value={form.status || "Ativa"}
+            onChange={change}
+          >
             <option>Ativa</option>
             <option>Inativa</option>
           </select>
         </label>
 
         <div className="modal-actions">
-          <button type="button" onClick={onCancel}>Cancelar</button>
+          <button type="button" onClick={onCancel}>
+            Cancelar
+          </button>
           <button type="submit">Salvar</button>
         </div>
       </form>
@@ -65,7 +79,9 @@ export default function Beneficiarios() {
     }
   }
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+  }, []);
 
   async function handleSave(payload) {
     try {
@@ -98,11 +114,20 @@ export default function Beneficiarios() {
 
       <div className="content-container">
         <div className="top-actions">
-          <button onClick={() => { setEditing(null); setShowForm(true); }}>Adicionar beneficiário</button>
+          <button
+            onClick={() => {
+              setEditing(null);
+              setShowForm(true);
+            }}
+          >
+            Adicionar beneficiário
+          </button>
         </div>
 
         {error && <p className="error">{error}</p>}
-        {loading ? (<p>Carregando...</p>) : (
+        {loading ? (
+          <p>Carregando...</p>
+        ) : (
           <table className="tabela">
             <thead>
               <tr>
@@ -114,16 +139,27 @@ export default function Beneficiarios() {
             </thead>
             <tbody>
               {items.length === 0 && (
-                <tr><td colSpan="4">Nenhum beneficiário encontrado.</td></tr>
+                <tr>
+                  <td colSpan="4">Nenhum beneficiário encontrado.</td>
+                </tr>
               )}
-              {items.map(it => (
+              {items.map((it) => (
                 <tr key={it.id || it._id || Math.random()}>
                   <td>{it.nome}</td>
                   <td>{it.cpf}</td>
                   <td>{it.status}</td>
                   <td>
-                    <button onClick={() => { setEditing(it); setShowForm(true); }}>Editar</button>
-                    <button onClick={() => handleDelete(it.id || it._id)}>Excluir</button>
+                    <button
+                      onClick={() => {
+                        setEditing(it);
+                        setShowForm(true);
+                      }}
+                    >
+                      Editar
+                    </button>
+                    <button onClick={() => handleDelete(it.id || it._id)}>
+                      Excluir
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -135,7 +171,10 @@ export default function Beneficiarios() {
       {showForm && (
         <Form
           initial={editing || {}}
-          onCancel={() => { setShowForm(false); setEditing(null); }}
+          onCancel={() => {
+            setShowForm(false);
+            setEditing(null);
+          }}
           onSave={handleSave}
         />
       )}

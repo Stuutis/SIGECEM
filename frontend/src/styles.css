@@ -19,10 +19,21 @@
   padding: 20px;
   box-sizing: border-box;
 }
-.sidebar h2 { margin: 0 0 16px 0; }
-.sidebar a { color: #dce6f7; text-decoration: none; }
-.sidebar ul { list-style: none; padding: 0; margin: 0; }
-.sidebar li { margin: 10px 0; }
+.sidebar h2 {
+  margin: 0 0 16px 0;
+}
+.sidebar a {
+  color: #dce6f7;
+  text-decoration: none;
+}
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.sidebar li {
+  margin: 10px 0;
+}
 
 .main {
   flex: 1;
@@ -30,7 +41,11 @@
   box-sizing: border-box;
 }
 
-h1 { margin-bottom: 12px; font-size: 24px; color: var(--primary-dark); }
+h1 {
+  margin-bottom: 12px;
+  font-size: 24px;
+  color: var(--primary-dark);
+}
 
 .cards-container {
   display: flex;
@@ -41,12 +56,11 @@ h1 { margin-bottom: 12px; font-size: 24px; color: var(--primary-dark); }
 .card {
   padding: 16px;
   border-radius: 10px;
-  box-shadow: 0 4px 14px rgba(16,24,40,0.06);
+  box-shadow: 0 4px 14px rgba(16, 24, 40, 0.06);
   width: 220px;
   color: white;
   background: var(--primary-light);
 }
-
 
 .card.azul-escuro {
   background: #6079a9;
@@ -64,7 +78,7 @@ h1 { margin-bottom: 12px; font-size: 24px; color: var(--primary-dark); }
   margin-top: 12px;
   padding: 16px;
   border-radius: 10px;
-  box-shadow: 0 4px 14px rgba(16,24,40,0.06);
+  box-shadow: 0 4px 14px rgba(16, 24, 40, 0.06);
 }
 
 .tabela {
@@ -72,12 +86,15 @@ h1 { margin-bottom: 12px; font-size: 24px; color: var(--primary-dark); }
   border-collapse: collapse;
   margin-top: 8px;
 }
-.tabela th, .tabela td {
+.tabela th,
+.tabela td {
   border-bottom: 1px solid #eee;
   padding: 10px;
   text-align: left;
 }
-.tabela thead { background: #fafafa; }
+.tabela thead {
+  background: #fafafa;
+}
 
 button {
   background: var(--primary-light);
@@ -88,8 +105,12 @@ button {
   cursor: pointer;
   margin-right: 6px;
 }
-button:hover { opacity: 0.9; }
-.top-actions { margin-bottom: 12px; }
+button:hover {
+  opacity: 0.9;
+}
+.top-actions {
+  margin-bottom: 12px;
+}
 
 .modal {
   position: fixed;
@@ -97,7 +118,7 @@ button:hover { opacity: 0.9; }
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(10,10,10,0.35);
+  background: rgba(10, 10, 10, 0.35);
   z-index: 100;
 }
 .modal-card {
@@ -105,30 +126,46 @@ button:hover { opacity: 0.9; }
   padding: 18px;
   border-radius: 10px;
   width: 420px;
-  box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
 }
-.modal-card h3 { margin-top: 0; }
-.modal-card label { display: block; margin-bottom: 8px; font-size: 14px; }
-.modal-card input, .modal-card select {
+.modal-card h3 {
+  margin-top: 0;
+}
+.modal-card label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+.modal-card input,
+.modal-card select {
   width: 100%;
   padding: 8px;
   margin-top: 4px;
   box-sizing: border-box;
 }
-.modal-actions { margin-top: 12px; display: flex; justify-content: flex-end; gap: 8px; }
-.modal-actions button:first-child { background: #e5e7eb; color: #111; }
+.modal-actions {
+  margin-top: 12px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.modal-actions button:first-child {
+  background: #e5e7eb;
+  color: #111;
+}
 
-.error { color: #b91c1c; }
+.error {
+  color: #b91c1c;
+}
 
 .sidebar li a {
   display: block;
   padding: 6px 4px;
   border-radius: 6px;
-  transition: background .2s;
+  transition: background 0.2s;
 }
 
 .sidebar li a:hover {
-  background: rgba(255,255,255,0.10);
+  background: rgba(255, 255, 255, 0.1);
   color: #fff;
 }
-

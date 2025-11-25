@@ -12,17 +12,27 @@ export default function Relatorios() {
     setLoading(true);
     try {
       const data = await api.list(ENTITY);
-      setItens(data || [
-        // placeholder se backend não existir ainda
-        { id: "mensal", titulo: "Relatório Mensal", periodo: "Outubro / 2025" },
-        { id: "anual", titulo: "Relatório Anual", periodo: "2025" },
-      ]);
+      setItens(
+        data || [
+          // placeholder se backend não existir ainda
+          {
+            id: "mensal",
+            titulo: "Relatório Mensal",
+            periodo: "Outubro / 2025",
+          },
+          { id: "anual", titulo: "Relatório Anual", periodo: "2025" },
+        ]
+      );
     } catch (err) {
       console.error(err);
-    } finally { setLoading(false); }
+    } finally {
+      setLoading(false);
+    }
   }
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+  }, []);
 
   function handleExport(id) {
     // exemplo: abrir endpoint de exportação
@@ -33,15 +43,25 @@ export default function Relatorios() {
     <div>
       <h1>Relatórios</h1>
       <div className="content-container">
-        {loading ? <p>Carregando...</p> : (
+        {loading ? (
+          <p>Carregando...</p>
+        ) : (
           <table className="tabela">
-            <thead><tr><th>Título</th><th>Período</th><th>Exportar</th></tr></thead>
+            <thead>
+              <tr>
+                <th>Título</th>
+                <th>Período</th>
+                <th>Exportar</th>
+              </tr>
+            </thead>
             <tbody>
-              {itens.map(r => (
+              {itens.map((r) => (
                 <tr key={r.id || r.titulo}>
                   <td>{r.titulo}</td>
                   <td>{r.periodo}</td>
-                  <td><button onClick={() => handleExport(r.id)}>PDF</button></td>
+                  <td>
+                    <button onClick={() => handleExport(r.id)}>PDF</button>
+                  </td>
                 </tr>
               ))}
             </tbody>

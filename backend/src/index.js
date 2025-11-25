@@ -1,9 +1,13 @@
 require('dotenv').config()
 require('./database/db')
-const doadoresRoutes = require('./routes/doadoresRoutes')
 
 const express = require('express')
 const cors = require('cors')
+
+const doadoresRoutes = require('./routes/doadoresRoutes')
+const authRoutes = require('./routes/authRoutes')
+
+const verifyToken = require('./middleware/authMiddleware')
 
 const app = express()
 
@@ -11,13 +15,14 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 
-
 // routes
 app.get('/', (req, res) => {
     res.send('API do SIGECEM está funcionando')
 })
 
-app.use('/api/doadores', doadoresRoutes)
+app.use('/api/auth', authRoutes)
+
+app.use('/api/doadores', verifyToken, doadoresRoutes)
 
 const PORT = process.env.PORT || 4000
 
