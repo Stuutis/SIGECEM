@@ -1,35 +1,157 @@
-export default function Beneficiarios() {
-  const data = [
-    { nome: "Maria Silva", cpf: "000.111.222-33", visitas: 4 },
-    { nome: "João Pereira", cpf: "111.222.333-44", visitas: 2 },
-    { nome: "Ana Costa", cpf: "321.654.987-00", visitas: 7 },
-  ]
+// src/pages/Familias.jsx
+import React, { useEffect, useState } from "react";
+import { api } from "../api";
+const ENTITY = "familias";
+
+export default function Familias() {
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [showForm, setShowForm] = useState(false);
+  const [editing, setEditing] = useState(null);
+
+  async function load() {
+    setLoading(true);
+    try {
+      const data = await api.list(ENTITY);
+      setItems(data || []);
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+  useEffect(() => {
+    load();
+  }, []);
+
+  async function handleSave(payload) {
+    try {
+      if (payload.id) await api.update(ENTITY, payload.id, payload);
+      else await api.create(ENTITY, payload);
+      setShowForm(false);
+      setEditing(null);
+      await load();
+    } catch (err) {
+      alert(err.message);
+    }
+  }
+
+  async function handleDelete(id) {
+    if (!confirm("Confirmar exclusão?")) return;
+    try {
+      await api.remove(ENTITY, id);
+      await load();
+    } catch (err) {
+      alert(err.message);
+    }
+  }
+
+  function Form({ initial = {}, onCancel, onSave }) {
+    const [form, setForm] = useState(initial);
+    useEffect(() => setForm(initial), [initial]);
+    function change(e) {
+      const { name, value } = e.target;
+      setForm((prev) => ({ ...prev, [name]: value }));
+    }
+    function submit(e) {
+      e.preventDefault();
+      onSave(form);
+    }
+    return (
+      <div className="modal">
+        <form className="modal-card" onSubmit={submit}>
+          <h3>{initial.id ? "Editar família" : "Nova família"}</h3>
+          <label>
+            Responsável
+            <input
+              name="responsavel"
+              value={form.responsavel || ""}
+              onChange={change}
+              required
+            />
+          </label>
+          <label>
+            Endereço
+            <input
+              name="endereco"
+              value={form.endereco || ""}
+              onChange={change}
+            />
+          </label>
+          <div className="modal-actions">
+            <button type="button" onClick={onCancel}>
+              Cancelar
+            </button>
+            <button type="submit">Salvar</button>
+          </div>
+        </form>
+      </div>
+    );
+  }
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">Beneficiários</h1>
+    <div>
+      <h1>Famílias</h1>
+      <div className="content-container">
+        <div className="top-actions">
+          <button
+            onClick={() => {
+              setEditing(null);
+              setShowForm(true);
+            }}
+          >
+            Adicionar família
+          </button>
+        </div>
 
-      <div className="bg-white shadow rounded-2xl overflow-hidden">
-        <table className="w-full text-left">
-          <thead className="bg-gray-100">
-            <tr>
-              <th className="p-3">Nome</th>
-              <th className="p-3">CPF</th>
-              <th className="p-3">Visitas</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {data.map((item, index) => (
-              <tr key={index} className="border-b">
-                <td className="p-3">{item.nome}</td>
-                <td className="p-3">{item.cpf}</td>
-                <td className="p-3">{item.visitas}</td>
+        {loading ? (
+          <p>Carregando...</p>
+        ) : (
+          <table className="tabela">
+            <thead>
+              <tr>
+                <th>Responsável</th>
+                <th>Endereço</th>
+                <th>Ações</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {items.length === 0 && (
+                <tr>
+                  <td colSpan="3">Nenhuma família.</td>
+                </tr>
+              )}
+              {items.map((it) => (
+                <tr key={it.id || it._id || Math.random()}>
+                  <td>{it.responsavel}</td>
+                  <td>{it.endereco}</td>
+                  <td>
+                    <button
+                      onClick={() => {
+                        setEditing(it);
+                        setShowForm(true);
+                      }}
+                    >
+                      Editar
+                    </button>
+                    <button onClick={() => handleDelete(it.id || it._id)}>
+                      Excluir
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
+
+      {showForm && (
+        <Form
+          initial={editing || {}}
+          onCancel={() => setShowForm(false)}
+          onSave={handleSave}
+        />
+      )}
     </div>
-  )
+  );
 }
