@@ -169,3 +169,105 @@ button:hover {
   background: rgba(255, 255, 255, 0.1);
   color: #fff;
 }
+.login-container {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f6f7fb;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* Card do login - Alinhado com card e content-container */
+.login-card {
+  background: #fff;
+  padding: 28px;
+  width: 380px;
+  border-radius: 10px; /* Alinhado com .card e .content-container */
+  box-shadow: 0 4px 14px rgba(16, 24, 40, 0.06); /* Alinhado com .card e .content-container */
+}
+
+/* Título - Alinhado com h1 */
+.login-title {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: var(--primary-dark);
+  font-size: 24px; /* Alinhado com h1 */
+  font-weight: 600;
+  text-align: center;
+}
+
+/* Inputs */
+.login-card label {
+  font-size: 14px;
+  margin-bottom: 8px;
+  display: block;
+  color: #222; /* Cor do texto principal */
+}
+
+.login-card input {
+  width: 100%;
+  padding: 10px;
+  margin-top: 4px;
+  margin-bottom: 16px;
+  border-radius: 6px; /* Alinhado com 'button' */
+  border: 1px solid #dcdcdc;
+  background: #fff; 
+  outline: none;
+  font-size: 14px;
+  transition: 0.2s;
+}
+
+.login-card input:focus {
+  border-color: var(--primary-light);
+  background: #fff;
+  box-shadow: 0 0 0 2px rgba(21, 89, 173, 0.18);
+}
+
+/* Botão - Unificado com o estilo de 'button' padrão */
+.btn-primary {
+  width: 100%;
+  padding: 10px;
+  border-radius: 6px; /* Alinhado com 'button' */
+  border: none;
+  background: var(--primary-light);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-primary:hover {
+  opacity: 0.9; /* Alinhado com 'button:hover' */
+}
+
+/* Link para cadastro */
+.login-link {
+  margin-top: 12px;
+  text-align: center;
+}
+
+.login-link a {
+  color: var(--primary);
+  text-decoration: none;
+  font-size: 14px;
+  transition: 0.2s;
+}
+
+.login-link a:hover {
+  text-decoration: underline;
+}
+
+/* Erro - Mantido */
+.error {
+  color: #b91c1c;
+  background: #fee2e2;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 14px;
+  margin-bottom: 10px;
+  border: 1px solid #fecaca;
+}

@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const pool = require("../database/db");
 
-// LISTAR TODOS
+
 router.get("/", async (req, res) => {
   try {
     const [rows] = await pool.query("SELECT * FROM beneficiarios ORDER BY id DESC");
@@ -13,7 +13,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-// BUSCA POR ID
+
 router.get("/:id", async (req, res) => {
   try {
     const [rows] = await pool.query(
@@ -32,7 +32,7 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-// CRIAR
+
 router.post("/", async (req, res) => {
   const { nome, cpf, status } = req.body;
 
@@ -62,7 +62,7 @@ router.post("/", async (req, res) => {
   }
 });
 
-// ATUALIZAR
+
 router.put("/:id", async (req, res) => {
   const { nome, cpf, status } = req.body;
 
@@ -93,7 +93,7 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-// DELETAR
+
 router.delete("/:id", async (req, res) => {
   try {
     const [result] = await pool.query(

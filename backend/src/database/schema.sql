@@ -28,10 +28,25 @@ CREATE TABLE IF NOT EXISTS categorias (
     nome_categoria VARCHAR(100) NOT NULL UNIQUE
 );
 
-CREATE TABLE IF NOT EXISTS produtos (
+CREATE TABLE produtos (
     id_produto INT AUTO_INCREMENT PRIMARY KEY,
     nome_produto VARCHAR(255) NOT NULL,
     id_categoria INT,
     quantidade_estoque DECIMAL(10,2) DEFAULT 0,
     FOREIGN KEY (id_categoria) REFERENCES categorias(id_categoria)
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS beneficiarios (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(255) NOT NULL,
+    cpf VARCHAR(20),
+    status VARCHAR(20) DEFAULT 'Ativa'
+);
+
+CREATE TABLE IF NOT EXISTS campanhas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(255) NOT NULL,
+    data DATE,
+    quantidade DECIMAL(10,2) DEFAULT 0,
+    foto VARCHAR(500)
 );
