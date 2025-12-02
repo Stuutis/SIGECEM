@@ -23,6 +23,7 @@ function Form({ initial = {}, onCancel, onSave }) {
     <div className="modal">
       <form className="modal-card" onSubmit={submit}>
         <h3>{initial.id ? "Editar beneficiário" : "Novo beneficiário"}</h3>
+
         <label>
           Nome
           <input
@@ -32,10 +33,16 @@ function Form({ initial = {}, onCancel, onSave }) {
             required
           />
         </label>
+
         <label>
           CPF
-          <input name="cpf" value={form.cpf || ""} onChange={change} />
+          <input
+            name="cpf"
+            value={form.cpf || ""}
+            onChange={change}
+          />
         </label>
+
         <label>
           Status
           <select
@@ -62,7 +69,7 @@ function Form({ initial = {}, onCancel, onSave }) {
 export default function Beneficiarios() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [editing, setEditing] = useState(null); // item being edited or null
+  const [editing, setEditing] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [error, setError] = useState("");
 
@@ -125,6 +132,7 @@ export default function Beneficiarios() {
         </div>
 
         {error && <p className="error">{error}</p>}
+
         {loading ? (
           <p>Carregando...</p>
         ) : (
@@ -137,14 +145,16 @@ export default function Beneficiarios() {
                 <th>Ações</th>
               </tr>
             </thead>
+
             <tbody>
               {items.length === 0 && (
                 <tr>
                   <td colSpan="4">Nenhum beneficiário encontrado.</td>
                 </tr>
               )}
+
               {items.map((it) => (
-                <tr key={it.id || it._id || Math.random()}>
+                <tr key={it.id}>
                   <td>{it.nome}</td>
                   <td>{it.cpf}</td>
                   <td>{it.status}</td>
@@ -157,7 +167,7 @@ export default function Beneficiarios() {
                     >
                       Editar
                     </button>
-                    <button onClick={() => handleDelete(it.id || it._id)}>
+                    <button onClick={() => handleDelete(it.id)}>
                       Excluir
                     </button>
                   </td>

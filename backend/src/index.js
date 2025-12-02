@@ -7,6 +7,8 @@ const cors = require('cors')
 const doadoresRoutes = require('./routes/doadoresRoutes')
 const authRoutes = require('./routes/authRoutes')
 const familiasRoutes = require('./routes/familiasRoutes')
+const campanhasRoutes = require("./routes/campanhas");
+const beneficiariosRoutes = require("./routes/beneficiariosRoutes");
 
 const verifyToken = require('./middleware/authMiddleware')
 
@@ -24,6 +26,8 @@ app.get('/', (req, res) => {
 app.use('/api/auth', authRoutes)
 app.use('/api/doadores', verifyToken, doadoresRoutes)
 app.use('/api/familias', verifyToken, familiasRoutes)
+app.use("/api/campanhas", verifyToken, campanhasRoutes);
+app.use("/api/beneficiarios", verifyToken, beneficiariosRoutes);
 
 const PORT = process.env.PORT || 4000
 

@@ -6,11 +6,15 @@ const ENTITY = "campanhas";
 
 function Form({ initial = {}, onCancel, onSave }) {
   const [form, setForm] = useState(initial);
+
   useEffect(() => setForm(initial), [initial]);
+
   function change(e) {
     const { name, value } = e.target;
+    // Lógica de change unificada
     setForm((prev) => ({ ...prev, [name]: value }));
   }
+
   function submit(e) {
     e.preventDefault();
     onSave(form);
@@ -20,32 +24,47 @@ function Form({ initial = {}, onCancel, onSave }) {
     <div className="modal">
       <form className="modal-card" onSubmit={submit}>
         <h3>{initial.id ? "Editar campanha" : "Nova campanha"}</h3>
+
         <label>
           Nome
-          <input
-            name="nome"
-            value={form.nome || ""}
-            onChange={change}
-            required
-          />
+          {/* Inputs do HEAD (mais limpos) foram unificados com a formatação do incoming */}
+          <input name="nome" value={form.nome || ""} onChange={change} required />
         </label>
+
         <label>
           Data
-          <input
-            type="date"
-            name="data"
-            value={form.data || ""}
-            onChange={change}
-          />
+          <input type="date" name="data" value={form.data || ""} onChange={change} />
         </label>
+
         <label>
           Quantidade arrecadada
+          <input name="quantidade" value={form.quantidade || ""} onChange={change} />
+        </label>
+
+        <label>
+          Foto (URL)
           <input
-            name="quantidade"
-            value={form.quantidade || ""}
+            name="foto"
+            placeholder="https://server.com/imagem.jpg"
+            value={form.foto || ""}
             onChange={change}
           />
         </label>
+
+        {form.foto && (
+          <div style={{ marginTop: "10px" }}>
+            <img
+              src={form.foto}
+              alt="preview"
+              style={{
+                width: "120px",
+                height: "120px",
+                objectFit: "cover",
+                borderRadius: "8px",
+              }}
+            />
+          </div>
+        )}
 
         <div className="modal-actions">
           <button type="button" onClick={onCancel}>
@@ -82,8 +101,15 @@ export default function Campanhas() {
 
   async function handleSave(payload) {
     try {
-      if (payload.id) await api.update(ENTITY, payload.id, payload);
-      else await api.create(ENTITY, payload);
+      // Lógica de update/create unificada
+      const idToUse = payload.id || payload._id;
+
+      if (idToUse) {
+        await api.update(ENTITY, idToUse, payload);
+      } else {
+        await api.create(ENTITY, payload);
+      }
+      
       setShowForm(false);
       setEditing(null);
       await load();
@@ -94,6 +120,7 @@ export default function Campanhas() {
 
   async function handleDelete(id) {
     if (!confirm("Confirmar exclusão?")) return;
+    // Apenas a versão HEAD tinha a quebra de linha (cosmético). Manter o código limpo.
     try {
       await api.remove(ENTITY, id);
       await load();
@@ -105,6 +132,7 @@ export default function Campanhas() {
   return (
     <div>
       <h1>Campanhas</h1>
+
       <div className="content-container">
         <div className="top-actions">
           <button
@@ -123,23 +151,48 @@ export default function Campanhas() {
           <table className="tabela">
             <thead>
               <tr>
+                {/* Mantida a coluna Foto (HEAD) */}
+                <th>Foto</th> 
                 <th>Campanha</th>
                 <th>Data</th>
                 <th>Quantidade</th>
                 <th>Ações</th>
               </tr>
             </thead>
+
             <tbody>
               {items.length === 0 && (
                 <tr>
-                  <td colSpan="4">Nenhuma campanha.</td>
+                  {/* Colspan ajustado para 5 colunas (incluindo Foto) */}
+                  <td colSpan="5">Nenhuma campanha.</td>
                 </tr>
               )}
+
               {items.map((it) => (
                 <tr key={it.id || it._id || Math.random()}>
+                  {/* Coluna Foto (HEAD) */}
+                  <td>
+                    {it.foto ? (
+                      <img
+                        src={it.foto}
+                        alt="campanha"
+                        style={{
+                          width: "60px",
+                          height: "60px",
+                          objectFit: "cover",
+                          borderRadius: "6px",
+                        }}
+                      />
+                    ) : (
+                      <span>–</span>
+                    )}
+                  </td>
+                  {/* Fim da Coluna Foto */}
+                  
                   <td>{it.nome}</td>
                   <td>{it.data}</td>
                   <td>{it.quantidade}</td>
+
                   <td>
                     <button
                       onClick={() => {

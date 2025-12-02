@@ -1,15 +1,18 @@
 // src/pages/Doadores.jsx
 import React, { useEffect, useState } from "react";
 import { api } from "../api";
+
 const ENTITY = "doadores";
 
 function Form({ initial = {}, onCancel, onSave }) {
   const [f, setF] = useState(initial);
   useEffect(() => setF(initial), [initial]);
+
   function change(e) {
     const { name, value } = e.target;
     setF((prev) => ({ ...prev, [name]: value }));
   }
+
   function submit(e) {
     e.preventDefault();
     onSave(f);
@@ -18,15 +21,52 @@ function Form({ initial = {}, onCancel, onSave }) {
   return (
     <div className="modal">
       <form className="modal-card" onSubmit={submit}>
-        <h3>{initial.id ? "Editar doador" : "Novo doador"}</h3>
+        <h3>{initial.id_doador ? "Editar doador" : "Novo doador"}</h3>
+
         <label>
           Nome
           <input name="nome" value={f.nome || ""} onChange={change} required />
         </label>
+
         <label>
-          Contato
-          <input name="contato" value={f.contato || ""} onChange={change} />
+          Tipo Pessoa (F/J)
+          <input
+            name="tipo_pessoa"
+            value={f.tipo_pessoa || ""}
+            onChange={change}
+            maxLength={1}
+            required
+          />
         </label>
+
+        <label>
+          Documento
+          <input
+            name="documento"
+            value={f.documento || ""}
+            onChange={change}
+            required
+          />
+        </label>
+
+        <label>
+          Telefone
+          <input
+            name="telefone"
+            value={f.telefone || ""}
+            onChange={change}
+          />
+        </label>
+
+        <label>
+          Email
+          <input
+            name="email"
+            value={f.email || ""}
+            onChange={change}
+          />
+        </label>
+
         <div className="modal-actions">
           <button type="button" onClick={onCancel}>
             Cancelar
@@ -55,14 +95,17 @@ export default function Doadores() {
       setLoading(false);
     }
   }
+
   useEffect(() => {
     load();
   }, []);
 
   async function handleSave(payload) {
     try {
-      if (payload.id) await api.update(ENTITY, payload.id, payload);
+      if (payload.id_doador)
+        await api.update(ENTITY, payload.id_doador, payload);
       else await api.create(ENTITY, payload);
+
       setShowForm(false);
       setEditing(null);
       await load();
@@ -84,6 +127,7 @@ export default function Doadores() {
   return (
     <div>
       <h1>Doadores</h1>
+
       <div className="content-container">
         <div className="top-actions">
           <button
@@ -103,20 +147,26 @@ export default function Doadores() {
             <thead>
               <tr>
                 <th>Nome</th>
-                <th>Contato</th>
+                <th>Documento</th>
+                <th>Telefone</th>
+                <th>Email</th>
                 <th>Ações</th>
               </tr>
             </thead>
+
             <tbody>
               {items.length === 0 && (
                 <tr>
-                  <td colSpan="3">Nenhum doador.</td>
+                  <td colSpan="5">Nenhum doador.</td>
                 </tr>
               )}
+
               {items.map((it) => (
-                <tr key={it.id || it._id || Math.random()}>
+                <tr key={it.id_doador}>
                   <td>{it.nome}</td>
-                  <td>{it.contato}</td>
+                  <td>{it.documento}</td>
+                  <td>{it.telefone}</td>
+                  <td>{it.email}</td>
                   <td>
                     <button
                       onClick={() => {
@@ -126,7 +176,7 @@ export default function Doadores() {
                     >
                       Editar
                     </button>
-                    <button onClick={() => handleDelete(it.id || it._id)}>
+                    <button onClick={() => handleDelete(it.id_doador)}>
                       Excluir
                     </button>
                   </td>
