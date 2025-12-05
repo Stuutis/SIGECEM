@@ -3,6 +3,11 @@ CREATE TABLE IF NOT EXISTS usuarios (
     nome VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
     senha VARCHAR(255) NOT NULL,
+    matricula VARCHAR(20),
+    setor VARCHAR(100),
+    data_ingresso DATE,
+    data_saida DATE,
+    tipo ENUM('admin', 'voluntario') DEFAULT 'voluntario';
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

@@ -14,9 +14,10 @@ const entradasRoutes = require('./routes/entradasRoutes')
 const distribuicaoRoutes = require('./routes/distribuicaoRoutes')
 const relatoriosRoutes = require('./routes/relatoriosRoutes')
 const financeiroRoutes = require('./routes/financeiroRoutes')
+const voluntariosRoutes = require('./routes/voluntariosRoutes')
 // Token
 const verifyToken = require('./middleware/authMiddleware')
-
+const verifyAdmin = require('./middleware/adminMiddleware')
 const app = express()
 
 // middlewares
@@ -40,6 +41,8 @@ app.use('/api/entradas', verifyToken, entradasRoutes)
 app.use('/api/distribuicao', verifyToken, distribuicaoRoutes)
 app.use('/api/relatorios', verifyToken, relatoriosRoutes)
 app.use('/api/financeiro', verifyToken, financeiroRoutes)
+app.use('/api/voluntarios', verifyToken, verifyAdmin, voluntariosRoutes)
+
 const PORT = process.env.PORT || 4000
 
 app.listen(PORT, () => {
