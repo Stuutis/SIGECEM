@@ -11,6 +11,7 @@ const campanhasRoutes = require('./routes/campanhasRoutes')
 const beneficiariosRoutes = require('./routes/beneficiariosRoutes')
 const categoriasRoutes = require('./routes/categoriasRoutes')
 const produtosRoutes = require('./routes/produtosRoutes')
+const entradasRoutes = require('./routes/entradasRoutes')
 
 // Token
 const verifyToken = require('./middleware/authMiddleware')
@@ -35,6 +36,7 @@ app.use('/api/campanhas', verifyToken, campanhasRoutes)
 app.use('/api/beneficiarios', verifyToken, beneficiariosRoutes)
 app.use('/api/categorias', verifyToken, categoriasRoutes)
 app.use('/api/estoque', verifyToken, produtosRoutes)
+app.use('/api/entradas', verifyToken, entradasRoutes)
 
 const PORT = process.env.PORT || 4000
 

@@ -50,3 +50,22 @@ CREATE TABLE IF NOT EXISTS campanhas (
     quantidade INT,
     foto VARCHAR(255)
 );
+
+CREATE TABLE IF NOT EXISTS doacoes (
+    id_doacao INT AUTO_INCREMENT PRIMARY KEY,
+    id_doador INT NOT NULL,
+    id_usuario INT, -- O voluntário/usuário que registrou a entrada
+    data_doacao DATETIME DEFAULT CURRENT_TIMESTAMP,
+    observacoes TEXT,
+    FOREIGN KEY (id_doador) REFERENCES doadores(id_doador),
+    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
+);
+
+CREATE TABLE IF NOT EXISTS itens_doacao (
+    id_item INT AUTO_INCREMENT PRIMARY KEY,
+    id_doacao INT NOT NULL,
+    id_produto INT NOT NULL,
+    quantidade DECIMAL(10,2) NOT NULL,
+    FOREIGN KEY (id_doacao) REFERENCES doacoes(id_doacao) ON DELETE CASCADE,
+    FOREIGN KEY (id_produto) REFERENCES produtos(id_produto)
+);
