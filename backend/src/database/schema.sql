@@ -88,3 +88,15 @@ CREATE TABLE IF NOT EXISTS itens_distribuicao (
     FOREIGN KEY (id_distribuicao) REFERENCES distribuicoes(id_distribuicao) ON DELETE CASCADE,
     FOREIGN KEY (id_produto) REFERENCES produtos(id_produto)
 );
+
+CREATE TABLE IF NOT EXISTS financeiro (
+    id_lancamento INT AUTO_INCREMENT PRIMARY KEY,
+    tipo ENUM('ENTRADA', 'SAIDA') NOT NULL, 
+    descricao VARCHAR(255) NOT NULL,        
+    valor DECIMAL(10, 2) NOT NULL,
+    data_movimentacao DATETIME DEFAULT CURRENT_TIMESTAMP,
+    id_usuario INT,                         
+    id_doador INT,                          
+    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario),
+    FOREIGN KEY (id_doador) REFERENCES doadores(id_doador)
+);

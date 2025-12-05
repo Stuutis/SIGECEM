@@ -13,7 +13,7 @@ const produtosRoutes = require('./routes/produtosRoutes')
 const entradasRoutes = require('./routes/entradasRoutes')
 const distribuicaoRoutes = require('./routes/distribuicaoRoutes')
 const relatoriosRoutes = require('./routes/relatoriosRoutes')
-
+const financeiroRoutes = require('./routes/financeiroRoutes')
 // Token
 const verifyToken = require('./middleware/authMiddleware')
 
@@ -39,7 +39,7 @@ app.use('/api/estoque', verifyToken, produtosRoutes)
 app.use('/api/entradas', verifyToken, entradasRoutes)
 app.use('/api/distribuicao', verifyToken, distribuicaoRoutes)
 app.use('/api/relatorios', verifyToken, relatoriosRoutes)
-
+app.use('/api/financeiro', verifyToken, financeiroRoutes)
 const PORT = process.env.PORT || 4000
 
 app.listen(PORT, () => {
