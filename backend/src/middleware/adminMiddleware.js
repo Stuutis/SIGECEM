@@ -13,5 +13,4 @@ const verifyAdmin = async (req, res, next) => {
         res.status(500).json({ message: 'Erro ao verificar permissões.' });
     }
 };
-
 module.exports = verifyAdmin;

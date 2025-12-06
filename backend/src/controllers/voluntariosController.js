@@ -18,7 +18,6 @@ const getAllVoluntarios = async (req, res) => {
     }
 };
 
-// Cadastrar novo Voluntário (feito por um Admin logado)
 const createVoluntario = async (req, res) => {
     const { nome, email, senha, matricula, setor, data_ingresso, tipo } = req.body;
 

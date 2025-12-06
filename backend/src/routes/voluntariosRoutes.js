@@ -7,4 +7,4 @@ router.post('/', voluntariosController.createVoluntario);
 router.put('/:id', voluntariosController.updateVoluntario);
 router.delete('/:id', voluntariosController.deleteVoluntario);
 
-module.exports = router;
+module.exports = router

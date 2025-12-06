@@ -15,7 +15,7 @@ const distribuicaoRoutes = require('./routes/distribuicaoRoutes')
 const relatoriosRoutes = require('./routes/relatoriosRoutes')
 const financeiroRoutes = require('./routes/financeiroRoutes')
 const voluntariosRoutes = require('./routes/voluntariosRoutes')
-// Token
+// Tokens
 const verifyToken = require('./middleware/authMiddleware')
 const verifyAdmin = require('./middleware/adminMiddleware')
 const app = express()
