@@ -36,13 +36,6 @@ CREATE TABLE IF NOT EXISTS produtos (
     FOREIGN KEY (id_categoria) REFERENCES categorias(id_categoria)
 );
 
-CREATE TABLE IF NOT EXISTS beneficiarios (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    nome VARCHAR(255) NOT NULL,
-    cpf VARCHAR(20),
-    status VARCHAR(50) DEFAULT 'Ativa'
-);
-
 CREATE TABLE IF NOT EXISTS campanhas (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(255) NOT NULL,
