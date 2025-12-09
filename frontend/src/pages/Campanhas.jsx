@@ -23,8 +23,8 @@ function Form({ initial = {}, onCancel, onSave }) {
     if (!form.data) return alert("Informe a data da campanha.");
 
     // 🔹 Data futura não permitida
-    const hoje = new Date().setHours(0,0,0,0);
-    const dataCampanha = new Date(form.data).setHours(0,0,0,0);
+    const hoje = new Date().setHours(0, 0, 0, 0);
+    const dataCampanha = new Date(form.data).setHours(0, 0, 0, 0);
     if (dataCampanha > hoje) return alert("A data não pode ser futura.");
 
     // 🔹 Quantidade numérica válida
@@ -104,6 +104,10 @@ export default function Campanhas() {
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState(null);
 
+  // 👇 AQUI ESTÁ A LÓGICA DO ADMIN
+  // Troque 'true' pela sua verificação real (ex: localStorage.getItem('role') === 'admin')
+  const isAdmin = true; 
+
   async function load() {
     setLoading(true);
     try {
@@ -150,14 +154,17 @@ export default function Campanhas() {
 
       <div className="content-container">
         <div className="top-actions">
-          <button
-            onClick={() => {
-              setEditing(null);
-              setShowForm(true);
-            }}
-          >
-            Adicionar campanha
-          </button>
+          {/* 👇 Só mostra botão de Adicionar se for Admin */}
+          {isAdmin && (
+            <button
+              onClick={() => {
+                setEditing(null);
+                setShowForm(true);
+              }}
+            >
+              Adicionar campanha
+            </button>
+          )}
         </div>
 
         {loading ? (
@@ -170,14 +177,16 @@ export default function Campanhas() {
                 <th>Campanha</th>
                 <th>Data</th>
                 <th>Quantidade</th>
-                <th>Ações</th>
+                {/* 👇 Só mostra coluna Ações se for Admin */}
+                {isAdmin && <th>Ações</th>}
               </tr>
             </thead>
 
             <tbody>
               {items.length === 0 && (
                 <tr>
-                  <td colSpan="5">Nenhuma campanha.</td>
+                  {/* Ajuste do colSpan caso a coluna suma ou apareça */}
+                  <td colSpan={isAdmin ? 5 : 4}>Nenhuma campanha.</td>
                 </tr>
               )}
 
@@ -204,22 +213,25 @@ export default function Campanhas() {
                   <td>{it.data ? new Date(it.data).toLocaleDateString() : "-"}</td>
                   <td>{it.quantidade || 0}</td>
 
-                  <td>
-                    <button
-                      onClick={() => {
-                        setEditing(it);
-                        setShowForm(true);
-                      }}
-                    >
-                      Editar
-                    </button>
-                    <button
-                      style={{ marginLeft: "10px", backgroundColor: "#c0392b" }}
-                      onClick={() => handleDelete(it.id)}
-                    >
-                      Excluir
-                    </button>
-                  </td>
+                  {/* 👇 Só mostra os botões de ação se for Admin */}
+                  {isAdmin && (
+                    <td>
+                      <button
+                        onClick={() => {
+                          setEditing(it);
+                          setShowForm(true);
+                        }}
+                      >
+                        Editar
+                      </button>
+                      <button
+                        style={{ marginLeft: "10px", backgroundColor: "#c0392b" }}
+                        onClick={() => handleDelete(it.id)}
+                      >
+                        Excluir
+                      </button>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>
