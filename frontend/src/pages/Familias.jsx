@@ -1,6 +1,7 @@
-// src/pages/Familias.jsx
 import React, { useEffect, useState } from "react";
 import { api } from "../api";
+
+// O endpoint no index.js é '/api/familias' 
 const ENTITY = "familias";
 
 export default function Familias() {
@@ -8,6 +9,7 @@ export default function Familias() {
   const [loading, setLoading] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState(null);
+  const [deletingId, setDeletingId] = useState(null); // para bloquear botão enquanto deleta
 
   async function load() {
     setLoading(true);
@@ -15,38 +17,82 @@ export default function Familias() {
       const data = await api.list(ENTITY);
       setItems(data || []);
     } catch (err) {
-      alert(err.message);
+      console.error("Erro ao carregar famílias:", err);
+      alert(err?.message || "Erro ao carregar famílias.");
     } finally {
       setLoading(false);
     }
   }
 
-  useEffect(() => {
-    load();
-  }, []);
+  useEffect(() => { load(); }, []);
 
   async function handleSave(payload) {
+    // Validações básicas (mantidas)
+    if (!payload.nome_responsavel || payload.nome_responsavel.length < 3) {
+      return alert("O nome do responsável deve conter no mínimo 3 caracteres.");
+    }
+
+    if (payload.contato && payload.contato.replace(/\D/g, "").length < 10) {
+      return alert("Informe um contato válido (mínimo 10 dígitos).");
+    }
+
+    if (payload.n_integrantes && Number(payload.n_integrantes) < 1) {
+      return alert("Número de integrantes deve ser maior que 0.");
+    }
+
     try {
-      if (payload.id_familia)
+      if (payload.id_familia) {
         await api.update(ENTITY, payload.id_familia, payload);
-      else await api.create(ENTITY, payload);
+      } else if (payload.id) {
+        // em alguns backends a chave pode ser 'id'
+        await api.update(ENTITY, payload.id, payload);
+      } else {
+        await api.create(ENTITY, payload);
+      }
 
       setShowForm(false);
       setEditing(null);
       await load();
     } catch (err) {
-      alert(err.message);
+      console.error("Erro ao salvar família:", err);
+      // tenta mostrar mensagem do backend quando disponível
+      const msg = err?.response?.data?.message || err?.message || "Erro ao salvar.";
+      alert("Erro ao salvar: " + msg);
     }
   }
 
-  async function handleDelete(id) {
+  async function handleDelete(idParam) {
+    // tenta normalizar id (pode receber id_familia ou um objeto)
+    let id = idParam;
+    if (!id && typeof idParam === "object") {
+      id = idParam.id_familia ?? idParam.id;
+    }
+
+    // Se usuário clicou no botão, muitas vezes passamos o item inteiro — faça robusto:
+    if (!id && typeof idParam === "number") id = idParam;
+
+    // Procura id na tabela caso ainda null (fallback)
+    if (!id && editing) id = editing.id_familia ?? editing.id;
+
+    if (!id) {
+      console.error("handleDelete: id inválido recebido:", idParam);
+      return alert("Erro interno: ID da família inválido. Verifique o console.");
+    }
+
     if (!confirm("Confirmar exclusão?")) return;
 
     try {
+      setDeletingId(id);
+      console.log("Enviando requisição DELETE para", ENTITY, id);
       await api.remove(ENTITY, id);
+      console.log("Exclusão OK para id:", id);
       await load();
     } catch (err) {
-      alert(err.message);
+      console.error("Erro ao excluir família:", err);
+      const msg = err?.response?.data?.message || err?.message || "Erro ao excluir.";
+      alert("Erro ao excluir: " + msg);
+    } finally {
+      setDeletingId(null);
     }
   }
 
@@ -68,15 +114,16 @@ export default function Familias() {
     return (
       <div className="modal">
         <form className="modal-card" onSubmit={submit}>
-          <h3>{initial.id_familia ? "Editar família" : "Nova família"}</h3>
+          <h3>{initial.id_familia || initial.id ? "Editar família" : "Nova família"}</h3>
 
           <label>
-            Responsável
+            Responsável *
             <input
               name="nome_responsavel"
               value={form.nome_responsavel || ""}
               onChange={change}
               required
+              minLength={3}
             />
           </label>
 
@@ -95,6 +142,7 @@ export default function Familias() {
               name="contato"
               value={form.contato || ""}
               onChange={change}
+              placeholder="Telefone / WhatsApp"
             />
           </label>
 
@@ -105,13 +153,12 @@ export default function Familias() {
               name="n_integrantes"
               value={form.n_integrantes || ""}
               onChange={change}
+              min={1}
             />
           </label>
 
           <div className="modal-actions">
-            <button type="button" onClick={onCancel}>
-              Cancelar
-            </button>
+            <button type="button" onClick={onCancel}>Cancelar</button>
             <button type="submit">Salvar</button>
           </div>
         </form>
@@ -152,33 +199,42 @@ export default function Familias() {
             <tbody>
               {items.length === 0 && (
                 <tr>
-                  <td colSpan="5">Nenhuma família.</td>
+                  <td colSpan="5">Nenhuma família encontrada.</td>
                 </tr>
               )}
 
-              {items.map((it) => (
-                <tr key={it.id_familia}>
-                  <td>{it.nome_responsavel}</td>
-                  <td>{it.endereco}</td>
-                  <td>{it.contato}</td>
-                  <td>{it.n_integrantes}</td>
+              {items.map((it) => {
+                const key = it.id_familia ?? it.id ?? Math.random();
+                const idToUse = it.id_familia ?? it.id;
+                return (
+                  <tr key={key}>
+                    <td>{it.nome_responsavel}</td>
+                    <td>{it.endereco}</td>
+                    <td>{it.contato}</td>
+                    <td>{it.n_integrantes}</td>
 
-                  <td>
-                    <button
-                      onClick={() => {
-                        setEditing(it);
-                        setShowForm(true);
-                      }}
-                    >
-                      Editar
-                    </button>
+                    <td>
+                      <button
+                        onClick={() => {
+                          setEditing(it);
+                          setShowForm(true);
+                        }}
+                      >
+                        Editar
+                      </button>
 
-                    <button onClick={() => handleDelete(it.id_familia)}>
-                      Excluir
-                    </button>
-                  </td>
-                </tr>
-              ))}
+                      <button
+                        style={{ marginLeft: 10, backgroundColor: "#c0392b" }}
+                        onClick={() => handleDelete(idToUse)}
+                        disabled={deletingId === idToUse}
+                        title={deletingId === idToUse ? "Excluindo..." : "Excluir"}
+                      >
+                        {deletingId === idToUse ? "Excluindo..." : "Excluir"}
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         )}

@@ -7,11 +7,17 @@ const cors = require('cors')
 const doadoresRoutes = require('./routes/doadoresRoutes')
 const authRoutes = require('./routes/authRoutes')
 const familiasRoutes = require('./routes/familiasRoutes')
-const campanhasRoutes = require("./routes/campanhas");
-const beneficiariosRoutes = require("./routes/beneficiariosRoutes");
-
+const campanhasRoutes = require('./routes/campanhasRoutes')
+const categoriasRoutes = require('./routes/categoriasRoutes')
+const produtosRoutes = require('./routes/produtosRoutes')
+const entradasRoutes = require('./routes/entradasRoutes')
+const distribuicaoRoutes = require('./routes/distribuicaoRoutes')
+const relatoriosRoutes = require('./routes/relatoriosRoutes')
+const financeiroRoutes = require('./routes/financeiroRoutes')
+const voluntariosRoutes = require('./routes/voluntariosRoutes')
+// Tokens
 const verifyToken = require('./middleware/authMiddleware')
-
+const verifyAdmin = require('./middleware/adminMiddleware')
 const app = express()
 
 // middlewares
@@ -22,12 +28,20 @@ app.use(express.json())
 app.get('/', (req, res) => {
     res.send('API do SIGECEM está funcionando')
 })
-
+// Rotas publicas
 app.use('/api/auth', authRoutes)
+
+// Rotas Protegidas
 app.use('/api/doadores', verifyToken, doadoresRoutes)
 app.use('/api/familias', verifyToken, familiasRoutes)
-app.use("/api/campanhas", verifyToken, campanhasRoutes);
-app.use("/api/beneficiarios", verifyToken, beneficiariosRoutes);
+app.use('/api/campanhas', verifyToken, campanhasRoutes)
+app.use('/api/categorias', verifyToken, categoriasRoutes)
+app.use('/api/estoque', verifyToken, produtosRoutes)
+app.use('/api/entradas', verifyToken, entradasRoutes)
+app.use('/api/distribuicao', verifyToken, distribuicaoRoutes)
+app.use('/api/relatorios', verifyToken, relatoriosRoutes)
+app.use('/api/financeiro', verifyToken, financeiroRoutes)
+app.use('/api/voluntarios', verifyToken, verifyAdmin, voluntariosRoutes)
 
 const PORT = process.env.PORT || 4000
 

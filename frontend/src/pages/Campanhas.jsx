@@ -1,4 +1,3 @@
-// src/pages/Campanhas.jsx
 import React, { useEffect, useState } from "react";
 import { api } from "../api";
 
@@ -11,12 +10,32 @@ function Form({ initial = {}, onCancel, onSave }) {
 
   function change(e) {
     const { name, value } = e.target;
-    // Lógica de change unificada
     setForm((prev) => ({ ...prev, [name]: value }));
   }
 
   function submit(e) {
     e.preventDefault();
+
+    // 🔹 Nome obrigatório
+    if (!form.nome?.trim()) return alert("O nome da campanha é obrigatório.");
+
+    // 🔹 Data obrigatória
+    if (!form.data) return alert("Informe a data da campanha.");
+
+    // 🔹 Data futura não permitida
+    const hoje = new Date().setHours(0,0,0,0);
+    const dataCampanha = new Date(form.data).setHours(0,0,0,0);
+    if (dataCampanha > hoje) return alert("A data não pode ser futura.");
+
+    // 🔹 Quantidade numérica válida
+    if (form.quantidade !== undefined && form.quantidade < 0)
+      return alert("A quantidade não pode ser negativa.");
+
+    // 🔹 Validar URL se preenchida
+    const urlRegex = /^(https?:\/\/)([\w.-]+)\.([a-z.]{2,6})(\/\S*)?$/i;
+    if (form.foto && !urlRegex.test(form.foto))
+      return alert("A URL da imagem é inválida. Use algo como: https://site.com/imagem.jpg");
+
     onSave(form);
   }
 
@@ -27,44 +46,46 @@ function Form({ initial = {}, onCancel, onSave }) {
 
         <label>
           Nome
-          {/* Inputs do HEAD (mais limpos) foram unificados com a formatação do incoming */}
-          <input name="nome" value={form.nome || ""} onChange={change} required />
+          <input
+            name="nome"
+            value={form.nome || ""}
+            onChange={change}
+            required
+          />
         </label>
 
         <label>
           Data
-          <input type="date" name="data" value={form.data || ""} onChange={change} />
+          <input
+            type="date"
+            name="data"
+            value={form.data ? form.data.split("T")[0] : ""}
+            onChange={change}
+            required
+          />
         </label>
 
         <label>
           Quantidade arrecadada
-          <input name="quantidade" value={form.quantidade || ""} onChange={change} />
+          <input
+            type="number"
+            min="0"
+            name="quantidade"
+            value={form.quantidade || ""}
+            onChange={change}
+            placeholder="0"
+          />
         </label>
 
         <label>
           Foto (URL)
           <input
             name="foto"
-            placeholder="https://server.com/imagem.jpg"
+            placeholder="https://exemplo.com/imagem.jpg"
             value={form.foto || ""}
             onChange={change}
           />
         </label>
-
-        {form.foto && (
-          <div style={{ marginTop: "10px" }}>
-            <img
-              src={form.foto}
-              alt="preview"
-              style={{
-                width: "120px",
-                height: "120px",
-                objectFit: "cover",
-                borderRadius: "8px",
-              }}
-            />
-          </div>
-        )}
 
         <div className="modal-actions">
           <button type="button" onClick={onCancel}>
@@ -101,15 +122,9 @@ export default function Campanhas() {
 
   async function handleSave(payload) {
     try {
-      // Lógica de update/create unificada
-      const idToUse = payload.id || payload._id;
+      if (payload.id) await api.update(ENTITY, payload.id, payload);
+      else await api.create(ENTITY, payload);
 
-      if (idToUse) {
-        await api.update(ENTITY, idToUse, payload);
-      } else {
-        await api.create(ENTITY, payload);
-      }
-      
       setShowForm(false);
       setEditing(null);
       await load();
@@ -120,7 +135,7 @@ export default function Campanhas() {
 
   async function handleDelete(id) {
     if (!confirm("Confirmar exclusão?")) return;
-    // Apenas a versão HEAD tinha a quebra de linha (cosmético). Manter o código limpo.
+
     try {
       await api.remove(ENTITY, id);
       await load();
@@ -151,8 +166,7 @@ export default function Campanhas() {
           <table className="tabela">
             <thead>
               <tr>
-                {/* Mantida a coluna Foto (HEAD) */}
-                <th>Foto</th> 
+                <th>Foto</th>
                 <th>Campanha</th>
                 <th>Data</th>
                 <th>Quantidade</th>
@@ -163,14 +177,12 @@ export default function Campanhas() {
             <tbody>
               {items.length === 0 && (
                 <tr>
-                  {/* Colspan ajustado para 5 colunas (incluindo Foto) */}
                   <td colSpan="5">Nenhuma campanha.</td>
                 </tr>
               )}
 
               {items.map((it) => (
-                <tr key={it.id || it._id || Math.random()}>
-                  {/* Coluna Foto (HEAD) */}
+                <tr key={it.id}>
                   <td>
                     {it.foto ? (
                       <img
@@ -187,11 +199,10 @@ export default function Campanhas() {
                       <span>–</span>
                     )}
                   </td>
-                  {/* Fim da Coluna Foto */}
-                  
+
                   <td>{it.nome}</td>
-                  <td>{it.data}</td>
-                  <td>{it.quantidade}</td>
+                  <td>{it.data ? new Date(it.data).toLocaleDateString() : "-"}</td>
+                  <td>{it.quantidade || 0}</td>
 
                   <td>
                     <button
@@ -202,7 +213,10 @@ export default function Campanhas() {
                     >
                       Editar
                     </button>
-                    <button onClick={() => handleDelete(it.id || it._id)}>
+                    <button
+                      style={{ marginLeft: "10px", backgroundColor: "#c0392b" }}
+                      onClick={() => handleDelete(it.id)}
+                    >
                       Excluir
                     </button>
                   </td>
