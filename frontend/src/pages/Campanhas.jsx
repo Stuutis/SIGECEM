@@ -16,22 +16,16 @@ function Form({ initial = {}, onCancel, onSave }) {
   function submit(e) {
     e.preventDefault();
 
-    // 🔹 Nome obrigatório
     if (!form.nome?.trim()) return alert("O nome da campanha é obrigatório.");
-
-    // 🔹 Data obrigatória
     if (!form.data) return alert("Informe a data da campanha.");
 
-    // 🔹 Data futura não permitida
     const hoje = new Date().setHours(0, 0, 0, 0);
     const dataCampanha = new Date(form.data).setHours(0, 0, 0, 0);
     if (dataCampanha > hoje) return alert("A data não pode ser futura.");
 
-    // 🔹 Quantidade numérica válida
     if (form.quantidade !== undefined && form.quantidade < 0)
       return alert("A quantidade não pode ser negativa.");
 
-    // 🔹 Validar URL se preenchida
     const urlRegex = /^(https?:\/\/)([\w.-]+)\.([a-z.]{2,6})(\/\S*)?$/i;
     if (form.foto && !urlRegex.test(form.foto))
       return alert("A URL da imagem é inválida. Use algo como: https://site.com/imagem.jpg");
@@ -46,12 +40,7 @@ function Form({ initial = {}, onCancel, onSave }) {
 
         <label>
           Nome
-          <input
-            name="nome"
-            value={form.nome || ""}
-            onChange={change}
-            required
-          />
+          <input name="nome" value={form.nome || ""} onChange={change} required />
         </label>
 
         <label>
@@ -88,9 +77,7 @@ function Form({ initial = {}, onCancel, onSave }) {
         </label>
 
         <div className="modal-actions">
-          <button type="button" onClick={onCancel}>
-            Cancelar
-          </button>
+          <button type="button" onClick={onCancel}>Cancelar</button>
           <button type="submit">Salvar</button>
         </div>
       </form>
@@ -104,9 +91,20 @@ export default function Campanhas() {
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState(null);
 
-  // 👇 AQUI ESTÁ A LÓGICA DO ADMIN
-  // Troque 'true' pela sua verificação real (ex: localStorage.getItem('role') === 'admin')
-  const isAdmin = true; 
+  // 🔹 Detecta se é admin usando o mesmo padrão do Doadores.jsx
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split(".")[1]));
+        setIsAdmin(payload.role === "admin" || payload.tipo === "admin");
+      } catch (err) {
+        console.error("Erro ao decodificar token:", err);
+      }
+    }
+  }, []);
 
   async function load() {
     setLoading(true);
@@ -139,7 +137,6 @@ export default function Campanhas() {
 
   async function handleDelete(id) {
     if (!confirm("Confirmar exclusão?")) return;
-
     try {
       await api.remove(ENTITY, id);
       await load();
@@ -153,19 +150,14 @@ export default function Campanhas() {
       <h1>Campanhas</h1>
 
       <div className="content-container">
-        <div className="top-actions">
-          {/* 👇 Só mostra botão de Adicionar se for Admin */}
-          {isAdmin && (
-            <button
-              onClick={() => {
-                setEditing(null);
-                setShowForm(true);
-              }}
-            >
+        {/* Botão Adicionar visível apenas para Admin */}
+        {isAdmin && (
+          <div className="top-actions">
+            <button onClick={() => { setEditing(null); setShowForm(true); }}>
               Adicionar campanha
             </button>
-          )}
-        </div>
+          </div>
+        )}
 
         {loading ? (
           <p>Carregando...</p>
@@ -177,16 +169,13 @@ export default function Campanhas() {
                 <th>Campanha</th>
                 <th>Data</th>
                 <th>Quantidade</th>
-                {/* 👇 Só mostra coluna Ações se for Admin */}
-                {isAdmin && <th>Ações</th>}
+                <th>Ações</th> {/* Todos veem a coluna */}
               </tr>
             </thead>
-
             <tbody>
               {items.length === 0 && (
                 <tr>
-                  {/* Ajuste do colSpan caso a coluna suma ou apareça */}
-                  <td colSpan={isAdmin ? 5 : 4}>Nenhuma campanha.</td>
+                  <td colSpan="5">Nenhuma campanha.</td>
                 </tr>
               )}
 
@@ -197,12 +186,7 @@ export default function Campanhas() {
                       <img
                         src={it.foto}
                         alt="campanha"
-                        style={{
-                          width: "60px",
-                          height: "60px",
-                          objectFit: "cover",
-                          borderRadius: "6px",
-                        }}
+                        style={{ width: "60px", height: "60px", objectFit: "cover", borderRadius: "6px" }}
                       />
                     ) : (
                       <span>–</span>
@@ -213,25 +197,24 @@ export default function Campanhas() {
                   <td>{it.data ? new Date(it.data).toLocaleDateString() : "-"}</td>
                   <td>{it.quantidade || 0}</td>
 
-                  {/* 👇 Só mostra os botões de ação se for Admin */}
-                  {isAdmin && (
-                    <td>
-                      <button
-                        onClick={() => {
-                          setEditing(it);
-                          setShowForm(true);
-                        }}
-                      >
-                        Editar
-                      </button>
-                      <button
-                        style={{ marginLeft: "10px", backgroundColor: "#c0392b" }}
-                        onClick={() => handleDelete(it.id)}
-                      >
-                        Excluir
-                      </button>
-                    </td>
-                  )}
+                  <td>
+                    {/* Botão Editar visível apenas para Admin */}
+                    {isAdmin && (
+                      <>
+                        <button
+                          onClick={() => { setEditing(it); setShowForm(true); }}
+                        >
+                          Editar
+                        </button>
+                        <button
+                          style={{ marginLeft: "10px", backgroundColor: "#c0392b", color: "white" }}
+                          onClick={() => handleDelete(it.id)}
+                        >
+                          Excluir
+                        </button>
+                      </>
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -239,7 +222,8 @@ export default function Campanhas() {
         )}
       </div>
 
-      {showForm && (
+      {/* Formulário visível apenas para Admin */}
+      {showForm && isAdmin && (
         <Form
           initial={editing || {}}
           onCancel={() => setShowForm(false)}

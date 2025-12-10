@@ -37,7 +37,7 @@ export default function Dashboard() {
         </div>
 
         <div className="card azul-claro">
-          <h2>Famílias Atendidas</h2>
+          <h2>Famílias Cadastradas</h2>
           <p>{resumo.total_familias}</p>
         </div>
 

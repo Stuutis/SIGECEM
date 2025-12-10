@@ -3,41 +3,37 @@ export const BASE_URL = "http://localhost:4000";
 async function request(path, options = {}) {
     const url = `${BASE_URL}${path}`;
 
-    const headers = options.headers || {}
-    headers["Content-Type"] = "application/json"
-    
-    // 🚨 ADICIONADO: Desabilita o cache do navegador para evitar 304 Not Modified
+    const headers = options.headers || {};
+    headers["Content-Type"] = "application/json";
+
+    // 🚨 Desabilita o cache do navegador
     headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
     headers["Pragma"] = "no-cache";
     headers["Expires"] = "0";
-    // -----------------------------------------------------------------------
+    
 
-    const token = localStorage.getItem("token")
+    const token = localStorage.getItem("token");
     if (token) {
-        headers["Authorization"] = `Bearer ${token}`
+        headers["Authorization"] = `Bearer ${token}`;
     }
 
-    const config = {
-        ...options,
-        headers
-    }
+    const config = { ...options, headers };
 
     const res = await fetch(url, config);
 
-    
     if (!res.ok) {
-        // ... (lógica de erro 401 e parsing de JSON) ...
+
         if (res.status === 401 && !url.includes('/login')) {
-            localStorage.removeItem("token")
-            window.location.href = "/login"
-            return
+            localStorage.removeItem("token");
+            window.location.href = "/login";
+            return;
         }
 
         const text = await res.text();
 
         try {
-            const jsonError = JSON.parse(text)
-            throw new Error(jsonError.message || res.statusText)
+            const jsonError = JSON.parse(text);
+            throw new Error(jsonError.message || res.statusText);
         } catch {
             throw new Error(text || res.statusText);
         }
@@ -51,6 +47,29 @@ async function request(path, options = {}) {
     return res.json();
 }
 
+// 🚨 NOVO: método para downloads binários (PDF, Excel)
+async function download(path) {
+    const url = `${BASE_URL}${path}`;
+    const headers = {};
+
+    const token = localStorage.getItem("token");
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+
+    const res = await fetch(url, { headers });
+
+    if (!res.ok) {
+        const text = await res.text();
+        try {
+            const jsonError = JSON.parse(text);
+            throw new Error(jsonError.message || res.statusText);
+        } catch {
+            throw new Error(text || res.statusText);
+        }
+    }
+
+    return res.blob(); // Retorna o blob do arquivo
+}
+
 export const api = {
     list(entity) {
         return request(`/api/${entity}`);
@@ -58,7 +77,7 @@ export const api = {
     get(entity, id) {
         return request(`/api/${entity}/${id}`);
     },
-    // 🚨 NOVO MÉTODO: Usado para endpoints que não seguem o padrão /entidade/id
+
     read(path) {
         return request(path);
     },
@@ -77,8 +96,10 @@ export const api = {
     register(nome, email, senha) {
         return request('/api/auth/register', { method: 'POST', body: JSON.stringify({ nome, email, senha }) });
     },
-    // 🚨 CORRIGIDO: Agora usa a rota correta do resumo geral (sem o /api, pois o request já adiciona)
+
     getDashboard() {
         return request('/api/relatorios/resumo-geral');
-    }
+    },
+    // 🚨 NOVO: download de PDF ou Excel
+    download
 };

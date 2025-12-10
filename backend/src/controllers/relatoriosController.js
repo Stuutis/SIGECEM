@@ -2,9 +2,7 @@ const pool = require('../database/db');
 const ExcelJS = require('exceljs');
 const PDFDocument = require('pdfkit');
 
-/* ============================================================
-   DASHBOARD - Usado em api.getDashboard()
-============================================================ */
+
 const getDashboard = async (req, res) => {
     try {
         const [rows] = await pool.query(`
@@ -22,9 +20,7 @@ const getDashboard = async (req, res) => {
     }
 };
 
-/* ============================================================
-   RESUMO GERAL - Usado nos relatórios PDF/Excel
-============================================================ */
+
 const getResumoGeral = async (req, res) => {
     try {
         const [rows] = await pool.query(`
@@ -42,9 +38,7 @@ const getResumoGeral = async (req, res) => {
     }
 };
 
-/* ============================================================
-   RELATÓRIOS DE DOAÇÕES
-============================================================ */
+
 const getRelatorioDoacoes = async (req, res) => {
     try {
         const [rows] = await pool.query(`
@@ -62,9 +56,7 @@ const getRelatorioDoacoes = async (req, res) => {
     }
 };
 
-/* ============================================================
-   RELATÓRIOS DE DISTRIBUIÇÕES
-============================================================ */
+
 const getRelatorioDistribuicoes = async (req, res) => {
     try {
         const [rows] = await pool.query(`
@@ -82,9 +74,7 @@ const getRelatorioDistribuicoes = async (req, res) => {
     }
 };
 
-/* ============================================================
-   EXPORTAÇÃO PDF
-============================================================ */
+
 const exportPDF = async (req, res) => {
     try {
         const [rows] = await pool.query(`
@@ -112,6 +102,8 @@ const exportPDF = async (req, res) => {
         doc.text(`Itens em Estoque: ${data.itens_estoque}`);
         doc.text(`Campanhas: ${data.campanhas_ativas}`);
 
+        console.log("Dados do PDF:", data);
+
         doc.end();
     } catch (error) {
         console.error("Erro ao gerar PDF:", error);
@@ -119,9 +111,7 @@ const exportPDF = async (req, res) => {
     }
 };
 
-/* ============================================================
-   EXPORTAÇÃO EXCEL
-============================================================ */
+
 const exportExcel = async (req, res) => {
     try {
         const [rows] = await pool.query(`

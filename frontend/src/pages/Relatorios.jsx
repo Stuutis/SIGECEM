@@ -38,30 +38,25 @@ export default function Relatorios() {
   }, []);
 
   // Função genérica para download de arquivos (PDF ou Excel)
-  async function baixarArquivo(tipo) {
-    try {
-      const url = `${api.BASE_URL}/api/relatorios/exportar/${tipo}`;
-      const res = await fetch(url, {
-        method: "GET",
-      });
+async function baixarArquivo(tipo) {
+  try {
+    const blob = await api.download(`/api/relatorios/exportar/${tipo}`);
 
-      if (!res.ok) throw new Error("Falha ao gerar arquivo");
+    const link = document.createElement("a");
+    link.href = window.URL.createObjectURL(blob);
+    link.download = tipo === "pdf" ? "relatorio_geral.pdf" : "resumo_geral.xlsx";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(link.href);
 
-      const blob = await res.blob();
-      const link = document.createElement("a");
-      link.href = window.URL.createObjectURL(blob);
-
-      // Define o nome do arquivo
-      link.download = tipo === "pdf" ? "relatorio_geral.pdf" : "resumo_geral.xlsx";
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(link.href);
-    } catch (err) {
-      console.error(err);
-      alert(`Erro ao baixar ${tipo.toUpperCase()}. Veja o console.`);
-    }
+    console.log(`✅ Download de ${tipo.toUpperCase()} concluído!`);
+  } catch (err) {
+    console.error("Erro ao baixar arquivo:", err);
+    alert(`Erro ao baixar ${tipo.toUpperCase()}. Veja o console.`);
   }
+}
+
 
   const thStyle = { border: "1px solid #ccc", padding: 8, backgroundColor: "#f0f0f0", textAlign: "left" };
   const tdStyle = { border: "1px solid #ccc", padding: 8 };
