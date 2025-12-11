@@ -24,63 +24,58 @@ export default function Register() {
   }
 
   return (
-    <div style={styles.container}>
-      <div className="modal-card" style={styles.card}>
-        <h2 style={{ textAlign: "center", color: "var(--primary)" }}>
-          Novo Usuário
-        </h2>
+    <div className="login-container">
+      <div className="login-card">
+        <h2 className="login-title">Novo Usuário</h2>
 
         {error && (
-          <p className="error" style={{ textAlign: "center" }}>
+          <p className="error" style={{ textAlign: "center", padding: "10px", borderRadius: "8px", marginBottom: "16px" }}>
             {error}
           </p>
         )}
 
         <form onSubmit={handleSubmit}>
           <label>
-            Nome <input name="nome" onChange={handleChange} required />
+            Nome
+            <input 
+              name="nome" 
+              onChange={handleChange} 
+              required 
+              placeholder="Digite seu nome completo"
+            />
           </label>
+
           <label>
-            E-mail{" "}
-            <input name="email" type="email" onChange={handleChange} required />
+            E-mail
+            <input 
+              name="email" 
+              type="email" 
+              onChange={handleChange} 
+              required 
+              placeholder="seu@email.com"
+            />
           </label>
+
           <label>
-            Senha{" "}
+            Senha
             <input
               name="senha"
               type="password"
               onChange={handleChange}
               required
+              placeholder="Crie uma senha segura"
             />
           </label>
 
-          <div
-            className="modal-actions"
-            style={{ marginTop: "20px", flexDirection: "column" }}
-          >
-            <button type="submit" style={{ width: "100%", margin: 0 }}>
-              Cadastrar
-            </button>
-          </div>
+          <button type="submit" className="btn-primary">
+            Cadastrar
+          </button>
         </form>
 
-        <div
-          style={{ marginTop: "15px", textAlign: "center", fontSize: "14px" }}
-        >
-          <Link to="/login">Voltar para Login</Link>
+        <div className="login-link" style={{ marginTop: "20px", textAlign: "center", fontSize: "14px" }}>
+          <Link to="/login">Já tem uma conta? Faça login</Link>
         </div>
       </div>
     </div>
   );
 }
-
-const styles = {
-  container: {
-    display: "flex",
-    height: "100vh",
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#f6f7fb",
-  },
-  card: { maxWidth: "400px", width: "100%" },
-};

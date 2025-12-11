@@ -1,7 +1,7 @@
 import React from "react";
 import { Routes, Route, Link, Navigate } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
-import Beneficiarios from "./pages/Beneficiarios";
+import Voluntarios from "./pages/Voluntarios";
 import Campanhas from "./pages/Campanhas";
 import Relatorios from "./pages/Relatorios";
 import Doadores from "./pages/Doadores";
@@ -37,7 +37,7 @@ function Layout({ children }) {
               <Link to="/">Dashboard</Link>
             </li>
             <li>
-              <Link to="/beneficiarios">Beneficiários</Link>
+              <Link to="/voluntarios">Voluntários</Link>
             </li>
             <li>
               <Link to="/campanhas">Campanhas</Link>
@@ -89,11 +89,11 @@ export default function App() {
         }
       />
       <Route
-        path="/beneficiarios"
+        path="/voluntarios"
         element={
           <PrivateRoute>
             <Layout>
-              <Beneficiarios />
+              <Voluntarios />
             </Layout>
           </PrivateRoute>
         }

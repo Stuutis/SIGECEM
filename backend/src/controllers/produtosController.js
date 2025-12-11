@@ -26,25 +26,40 @@ const getAllProdutos = async (req, res) => {
 };
 
 const createProduto = async (req, res) => {
-    const { produto, quantidade, id_categoria } = req.body;
-
-    if (!produto) {
-        return res.status(400).json({ message: 'Nome do produto é obrigatório.' });
-    }
+    let { produto, quantidade, id_categoria, categoria } = req.body;
 
     try {
-        const query = 'INSERT INTO produtos (nome_produto, quantidade_estoque, id_categoria) VALUES (?, ?, ?)';
-        const [result] = await pool.query(query, [produto, quantidade || 0, id_categoria || null]);
+        // Se veio texto de categoria nova, cria ou usa existente
+        if (categoria && !id_categoria) {
+            const [cat] = await pool.query(
+                "SELECT id_categoria FROM categorias WHERE nome_categoria = ?",
+                [categoria]
+            );
 
-        res.status(201).json({
-            message: 'Produto cadastrado com sucesso!',
-            id: result.insertId
-        });
+            if (cat.length > 0) {
+                id_categoria = cat[0].id_categoria; // já existe
+            } else {
+                const [nova] = await pool.query(
+                    "INSERT INTO categorias (nome_categoria) VALUES (?)",
+                    [categoria]
+                );
+                id_categoria = nova.insertId;
+            }
+        }
+
+        const [result] = await pool.query(`
+            INSERT INTO produtos (nome_produto, quantidade_estoque, id_categoria)
+            VALUES (?, ?, ?)
+        `, [produto, quantidade || 0, id_categoria || null]);
+
+        res.status(201).json({ message: "Produto cadastrado com sucesso!" });
+
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Erro ao cadastrar produto.' });
+        console.log(error);
+        res.status(500).json({ message: "Erro ao cadastrar produto." });
     }
 };
+
 
 const updateProduto = async (req, res) => {
     const { id } = req.params;

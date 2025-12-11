@@ -6,8 +6,8 @@ CREATE TABLE IF NOT EXISTS usuarios (
     matricula VARCHAR(20),
     setor VARCHAR(100),
     data_ingresso DATE,
-    data_saida DATE,
-    tipo ENUM('admin', 'voluntario') DEFAULT 'voluntario';
+    data_saida DATE,  -- Necessário para Inativação Lógica (deleteVoluntario)
+    tipo ENUM('admin', 'voluntario') DEFAULT 'voluntario', -- Necessário para Permissões
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -39,6 +39,7 @@ CREATE TABLE IF NOT EXISTS produtos (
     id_categoria INT,
     quantidade_estoque DECIMAL(10,2) DEFAULT 0,
     FOREIGN KEY (id_categoria) REFERENCES categorias(id_categoria)
+    
 );
 
 CREATE TABLE IF NOT EXISTS campanhas (

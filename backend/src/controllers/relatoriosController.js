@@ -1,75 +1,158 @@
 const pool = require('../database/db');
+const ExcelJS = require('exceljs');
+const PDFDocument = require('pdfkit');
 
-const getResumoGeral = async (req, res) => {
+
+const getDashboard = async (req, res) => {
     try {
-        const query = `
+        const [rows] = await pool.query(`
             SELECT 
                 (SELECT COUNT(*) FROM doadores) AS total_doadores,
                 (SELECT COUNT(*) FROM familias) AS total_familias,
                 (SELECT COALESCE(SUM(quantidade_estoque), 0) FROM produtos) AS itens_estoque,
                 (SELECT COUNT(*) FROM campanhas) AS campanhas_ativas
-        `;
-        const [rows] = await pool.query(query);
-        res.json(rows[0]);
+        `);
+
+        return res.json(rows[0]);
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Erro ao buscar resumo geral.' });
+        console.error("Erro ao carregar dashboard:", error);
+        return res.status(500).json({ message: "Erro ao carregar dados do dashboard." });
     }
 };
+
+
+const getResumoGeral = async (req, res) => {
+    try {
+        const [rows] = await pool.query(`
+            SELECT 
+                (SELECT COUNT(*) FROM doadores) AS total_doadores,
+                (SELECT COUNT(*) FROM familias) AS total_familias,
+                (SELECT COALESCE(SUM(quantidade_estoque), 0) FROM produtos) AS itens_estoque,
+                (SELECT COUNT(*) FROM campanhas) AS campanhas_ativas
+        `);
+
+        return res.json(rows[0]);
+    } catch (error) {
+        console.error("Erro ao obter resumo geral:", error);
+        return res.status(500).json({ message: "Erro interno do servidor ao obter resumo geral." });
+    }
+};
+
 
 const getRelatorioDoacoes = async (req, res) => {
-    const { inicio, fim } = req.query;
     try {
-        let query = `
-            SELECT d.data_doacao, doa.nome AS doador, p.nome_produto, i.quantidade
+        const [rows] = await pool.query(`
+            SELECT p.nome_produto, SUM(i.quantidade) AS total_doado
             FROM itens_doacao i
-            JOIN doacoes d ON i.id_doacao = d.id_doacao
-            JOIN doadores doa ON d.id_doador = doa.id_doador
             JOIN produtos p ON i.id_produto = p.id_produto
-        `;
+            GROUP BY p.id_produto, p.nome_produto
+            ORDER BY p.nome_produto
+        `);
 
-        const params = [];
-        if (inicio && fim) {
-            query += ' WHERE d.data_doacao BETWEEN ? AND ?';
-            params.push(inicio, fim);
-        }
-
-        query += ' ORDER BY d.data_doacao DESC';
-
-        const [rows] = await pool.query(query, params);
-        res.json(rows);
+        return res.json(rows);
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Erro ao gerar relatório de doações.' });
+        console.error("Erro ao gerar relatório de doações:", error);
+        return res.status(500).json({ message: "Erro ao buscar doações" });
     }
 };
+
 
 const getRelatorioDistribuicoes = async (req, res) => {
-    const { inicio, fim } = req.query;
-
     try {
-        let query = `
-            SELECT d.data_entrega, f.nome_responsavel AS familia, p.nome_produto, i.quantidade
+        const [rows] = await pool.query(`
+            SELECT p.nome_produto, SUM(i.quantidade) AS total_distribuido
             FROM itens_distribuicao i
-            JOIN distribuicoes d ON i.id_distribuicao = d.id_distribuicao
-            JOIN familias f ON d.id_familia = f.id_familia
             JOIN produtos p ON i.id_produto = p.id_produto
-        `;
+            GROUP BY p.id_produto, p.nome_produto
+            ORDER BY p.nome_produto
+        `);
 
-        const params = [];
-        if (inicio && fim) {
-            query += ' WHERE d.data_entrega BETWEEN ? AND ?';
-            params.push(inicio, fim);
-        }
-
-        query += ' ORDER BY d.data_entrega DESC';
-
-        const [rows] = await pool.query(query, params);
-        res.json(rows);
+        return res.json(rows);
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Erro ao gerar relatório de distribuições.' });
+        console.error("Erro ao gerar relatório de distribuições:", error);
+        return res.status(500).json({ message: "Erro ao buscar distribuições" });
     }
 };
 
-module.exports = { getResumoGeral, getRelatorioDoacoes, getRelatorioDistribuicoes };
+
+const exportPDF = async (req, res) => {
+    try {
+        const [rows] = await pool.query(`
+            SELECT 
+                (SELECT COUNT(*) FROM doadores) AS total_doadores,
+                (SELECT COUNT(*) FROM familias) AS total_familias,
+                (SELECT COALESCE(SUM(quantidade_estoque), 0) FROM produtos) AS itens_estoque,
+                (SELECT COUNT(*) FROM campanhas) AS campanhas_ativas
+        `);
+
+        const data = rows[0];
+
+        const doc = new PDFDocument({ margin: 30 });
+        const filename = "resumo_geral.pdf";
+
+        res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+        res.setHeader('Content-Type', 'application/pdf');
+
+        doc.pipe(res);
+
+        doc.fontSize(20).text("Resumo Geral do Sistema", { align: "center" });
+        doc.moveDown();
+        doc.fontSize(14).text(`Total de Doadores: ${data.total_doadores}`);
+        doc.text(`Total de Famílias: ${data.total_familias}`);
+        doc.text(`Itens em Estoque: ${data.itens_estoque}`);
+        doc.text(`Campanhas: ${data.campanhas_ativas}`);
+
+        console.log("Dados do PDF:", data);
+
+        doc.end();
+    } catch (error) {
+        console.error("Erro ao gerar PDF:", error);
+        res.status(500).json({ message: "Erro ao gerar PDF" });
+    }
+};
+
+
+const exportExcel = async (req, res) => {
+    try {
+        const [rows] = await pool.query(`
+            SELECT 
+                (SELECT COUNT(*) FROM doadores) AS total_doadores,
+                (SELECT COUNT(*) FROM familias) AS total_familias,
+                (SELECT COALESCE(SUM(quantidade_estoque), 0) FROM produtos) AS itens_estoque,
+                (SELECT COUNT(*) FROM campanhas) AS campanhas_ativas
+        `);
+
+        const data = rows[0];
+
+        const workbook = new ExcelJS.Workbook();
+        const sheet = workbook.addWorksheet('Resumo Geral');
+
+        sheet.columns = [
+            { header: 'Métrica', key: 'metrica', width: 25 },
+            { header: 'Valor', key: 'valor', width: 15 }
+        ];
+
+        sheet.addRow({ metrica: 'Doadores', valor: data.total_doadores });
+        sheet.addRow({ metrica: 'Famílias', valor: data.total_familias });
+        sheet.addRow({ metrica: 'Itens em Estoque', valor: data.itens_estoque });
+        sheet.addRow({ metrica: 'Campanhas', valor: data.campanhas_ativas });
+
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.setHeader('Content-Disposition', 'attachment; filename=resumo_geral.xlsx');
+
+        await workbook.xlsx.write(res);
+        res.end();
+    } catch (error) {
+        console.error("Erro ao gerar Excel:", error);
+        res.status(500).json({ message: "Erro ao gerar Excel" });
+    }
+};
+
+module.exports = { 
+    getDashboard,
+    getResumoGeral,
+    getRelatorioDoacoes,
+    getRelatorioDistribuicoes,
+    exportPDF,
+    exportExcel
+};

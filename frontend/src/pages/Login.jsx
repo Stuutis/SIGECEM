@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { api } from "../api";
 import { useNavigate, Link } from "react-router-dom";
+import "../App.css"; // garanta que esse CSS está sendo importado
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -13,79 +14,52 @@ export default function Login() {
     setError("");
 
     try {
-      const data = await api.login(email, senha);
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.usuario));
+      const response = await api.login(email, senha);
+
+      localStorage.setItem("token", response.token);
+      localStorage.setItem("user", JSON.stringify(response.usuario));
+
       navigate("/");
     } catch (err) {
-      setError(err.message || "Erro ao fazer login");
+      setError(err?.response?.data?.message || "Erro ao fazer login");
     }
   }
 
   return (
-    <div style={styles.container}>
-      <div className="modal-card" style={styles.card}>
-        <h2 style={{ textAlign: "center", color: "var(--primary)" }}>
-          Login SIGECEM
-        </h2>
+    <div className="login-container">
+      <div className="modal-card login-card">
+        <h2 className="login-title">Acesso ao SIGECEM</h2>
 
-        {error && (
-          <p className="error" style={{ textAlign: "center" }}>
-            {error}
-          </p>
-        )}
+        {error && <p className="error">{error}</p>}
 
         <form onSubmit={handleSubmit}>
-          <label>
-            E-mail
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </label>
+          <label>E-mail</label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            placeholder="Digite seu e-mail"
+          />
 
-          <label>
-            Senha
-            <input
-              type="password"
-              value={senha}
-              onChange={(e) => setSenha(e.target.value)}
-              required
-            />
-          </label>
+          <label>Senha</label>
+          <input
+            type="password"
+            value={senha}
+            onChange={(e) => setSenha(e.target.value)}
+            required
+            placeholder="Digite sua senha"
+          />
 
-          <div
-            className="modal-actions"
-            style={{ marginTop: "20px", flexDirection: "column" }}
-          >
-            <button type="submit" style={{ width: "100%", margin: 0 }}>
-              Entrar
-            </button>
-          </div>
+          <button type="submit" className="btn-primary">
+            Entrar
+          </button>
         </form>
 
-        <div
-          style={{ marginTop: "15px", textAlign: "center", fontSize: "14px" }}
-        >
+        <div className="login-link">
           <Link to="/register">Não tem conta? Cadastre-se</Link>
         </div>
       </div>
     </div>
   );
 }
-
-const styles = {
-  container: {
-    display: "flex",
-    height: "100vh",
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#f6f7fb",
-  },
-  card: {
-    maxWidth: "400px",
-    width: "100%",
-  },
-};
