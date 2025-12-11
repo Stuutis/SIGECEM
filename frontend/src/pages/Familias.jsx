@@ -41,7 +41,7 @@ export default function Familias() {
   useEffect(() => { load(); }, []);
 
   async function handleSave(payload) {
-    // Todos podem adicionar
+    
     if (!payload.nome_responsavel || payload.nome_responsavel.length < 3) {
       return alert("O nome do responsável deve conter no mínimo 3 caracteres.");
     }
@@ -54,10 +54,10 @@ export default function Familias() {
 
     try {
       if (editing && isAdmin) {
-        // Apenas admin pode editar
+
         await api.update(ENTITY, payload.id_familia ?? payload.id, payload);
       } else {
-        // Qualquer usuário pode criar
+
         await api.create(ENTITY, payload);
       }
 
@@ -93,9 +93,22 @@ export default function Familias() {
     const [form, setForm] = useState(initial);
     useEffect(() => setForm(initial), [initial]);
 
+    // 🔹 Máscara de telefone
+    function maskPhone(value) {
+      const numbers = value.replace(/\D/g, "");
+
+      if (numbers.length > 10) {
+        return numbers.replace(/^(\d{2})(\d{5})(\d{4}).*/, "($1) $2-$3");
+      }
+
+      return numbers.replace(/^(\d{2})(\d{4})(\d{0,4}).*/, "($1) $2-$3").trim();
+    }
+
     function change(e) {
       const { name, value } = e.target;
-      setForm((prev) => ({ ...prev, [name]: value }));
+      const newValue = name === "contato" ? maskPhone(value) : value;
+
+      setForm((prev) => ({ ...prev, [name]: newValue }));
     }
 
     function submit(e) {
@@ -134,7 +147,8 @@ export default function Familias() {
               name="contato"
               value={form.contato || ""}
               onChange={change}
-              placeholder="Telefone / WhatsApp"
+              placeholder="(00) 00000-0000"
+              maxLength={15}
             />
           </label>
 
@@ -163,7 +177,7 @@ export default function Familias() {
       <h1>Famílias</h1>
 
       <div className="content-container">
-        {/* Botão Adicionar visível para todos */}
+
         <div className="top-actions">
           <button onClick={() => { setEditing(null); setShowForm(true); }}>
             Adicionar família
@@ -194,6 +208,7 @@ export default function Familias() {
               {items.map((it) => {
                 const key = it.id_familia ?? it.id ?? Math.random();
                 const idToUse = it.id_familia ?? it.id;
+
                 return (
                   <tr key={key}>
                     <td>{it.nome_responsavel}</td>
@@ -224,7 +239,7 @@ export default function Familias() {
         )}
       </div>
 
-      {/* Formulário visível para todos */}
+
       {showForm && (
         <Form
           initial={editing || {}}

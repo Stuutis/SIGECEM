@@ -1,14 +1,36 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { api } from "../api";
-import { useAuth } from "../hooks/useAuth";
 
-const ENTITY = "estoque";
+// MOCK sem backend
+const mockDB = [
+  { id: 1, produto: "Arroz", quantidade: 10, categoria: "Alimentos" },
+  { id: 2, produto: "Sabão", quantidade: 5, categoria: "Limpeza" }
+];
 
-// ================= FORM COMPONENTE ==================
+const api = {
+  list: async () => mockDB,
+  create: async (entity, item) => {
+    item.id = mockDB.length + 1;
+    mockDB.push(item);
+  },
+  update: async (entity, id, item) => {
+    const idx = mockDB.findIndex((i) => i.id === id);
+    if (idx !== -1) mockDB[idx] = { ...mockDB[idx], ...item };
+  },
+  remove: async (entity, id) => {
+    const idx = mockDB.findIndex((i) => i.id === id);
+    if (idx !== -1) mockDB.splice(idx, 1);
+  }
+};
+
+// ================= FORM ==================
 function Form({ initial = {}, onCancel, onSave }) {
-  const [f, setF] = useState(initial);
+  const empty = { produto: "", quantidade: 0, categoria: "" };
 
-  useEffect(() => setF(initial), [initial]);
+  const [f, setF] = useState({ ...empty, ...initial });
+
+  useEffect(() => {
+    setF({ ...empty, ...initial });
+  }, [initial]);
 
   function change(e) {
     const { name, value } = e.target;
@@ -18,7 +40,7 @@ function Form({ initial = {}, onCancel, onSave }) {
   function submit(e) {
     e.preventDefault();
     if (!f.produto) return alert("Informe o nome do produto!");
-    if (!f.quantidade) f.quantidade = 0;
+
     onSave(f);
   }
 
@@ -28,18 +50,28 @@ function Form({ initial = {}, onCancel, onSave }) {
         <h3>{initial.id ? "Editar Produto" : "Novo Produto"}</h3>
 
         <label>Produto
-          <input name="produto" value={f.produto || ""} onChange={change} required />
+          <input
+            name="produto"
+            value={f.produto}
+            onChange={change}
+            required
+          />
         </label>
 
         <label>Quantidade
-          <input name="quantidade" type="number" min="0"
-            value={f.quantidade || ""} onChange={change} />
+          <input
+            name="quantidade"
+            type="number"
+            min="0"
+            value={f.quantidade}
+            onChange={change}
+          />
         </label>
 
         <label>Categoria
           <input
             name="categoria"
-            value={f.categoria || ""}
+            value={f.categoria}
             onChange={change}
             placeholder="Ex: Alimentos, Limpeza..."
           />
@@ -56,117 +88,108 @@ function Form({ initial = {}, onCancel, onSave }) {
 
 // ================= ESTOQUE ==================
 export default function Estoque() {
-  const { isAdmin } = useAuth();
-  const userIsAdmin = isAdmin();
+  const userIsAdmin = true;
 
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState(null);
 
-  // ================= LOAD ==================
+
   const load = useCallback(async () => {
     setLoading(true);
-    try {
-      const data = await api.list(ENTITY);
-      setItems(data || []);
-    } catch (err) {
-      console.error(err);
-      alert("Erro ao carregar produtos");
-    } finally {
-      setLoading(false);
-    }
+    const data = await api.list("estoque");
+    setItems([...data]);
+    setLoading(false);
   }, []);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    load();
+  }, [load]);
 
-  // ================= SAVE ==================
+
+
   async function handleSave(payload) {
-    try {
-      if (payload.id)
-        await api.update(ENTITY, payload.id, payload);
-      else
-        await api.create(ENTITY, payload);
+    if (payload.id) await api.update("estoque", payload.id, payload);
+    else await api.create("estoque", payload);
 
-      setShowForm(false);
-      setEditing(null);
-      load();
-    } catch (err) {
-      alert("Erro ao salvar produto: " + err.message);
-    }
+    setShowForm(false);
+    setEditing(null);
+    load();
   }
 
-  // ================= DELETE ==================
+
   async function handleDelete(id) {
     if (!confirm("Confirmar exclusão?")) return;
-
-    try {
-      await api.remove(ENTITY, id);
-      load();
-    } catch (err) {
-      alert("Erro ao excluir: " + (err.message || "Erro de comunicação com o servidor."));
-    }
+    await api.remove("estoque", id);
+    load();
   }
 
-  // ================= UI ==================
+
   return (
     <div>
       <h1>Estoque / Produtos</h1>
 
       <div className="content-container">
-        {/* Botão Adicionar Produto: APENAS Admin */}
+
         {userIsAdmin && (
           <button onClick={() => { setEditing(null); setShowForm(true); }}>
             + Adicionar Produto
           </button>
         )}
 
-        {loading ? <p>Carregando...</p> : (
+        {loading ? (
+          <p>Carregando...</p>
+        ) : (
           <table className="tabela">
             <thead>
               <tr>
                 <th>Produto</th>
                 <th>Qtd</th>
                 <th>Categoria</th>
-                {userIsAdmin && <th>Ações</th>}
+                <th>Ações</th>
               </tr>
             </thead>
 
             <tbody>
-              {items.length === 0 && (
-                <tr>
-                  <td colSpan={userIsAdmin ? 4 : 3}>Nenhum produto cadastrado.</td>
-                </tr>
-              )}
+              
 
               {items.map((it) => (
                 <tr key={it.id}>
                   <td>{it.produto}</td>
                   <td>{it.quantidade}</td>
                   <td>{it.categoria}</td>
+                  <td>
+                    <button
+                      onClick={() => {
+                        setEditing(it);
+                        setShowForm(true);
+                      }}
+                    >
+                      Editar
+                    </button>
 
-                  {userIsAdmin && (
-                    <td>
-                      <button onClick={() => { setEditing(it); setShowForm(true); }}>
-                        Editar
-                      </button>
-                      <button
-                        style={{ marginLeft: 10, backgroundColor: "#c0392b", color: "white" }}
-                        onClick={() => handleDelete(it.id)}
-                      >
-                        Excluir
-                      </button>
-                    </td>
-                  )}
+                    <button
+                      style={{ marginLeft: 10, backgroundColor: "#c0392b", color: "white" }}
+                      onClick={() => handleDelete(it.id)}
+                    >
+                      Excluir
+                    </button>
+                  </td>
                 </tr>
               ))}
+
+              {items.length === 0 && (
+                <tr>
+                  <td colSpan={4}>Nenhum produto cadastrado.</td>
+                </tr>
+              )}
             </tbody>
           </table>
         )}
       </div>
 
-      {/* Formulário visível apenas para Admin */}
-      {showForm && userIsAdmin && (
+      {showForm && (
         <Form
           initial={editing || {}}
           onCancel={() => { setShowForm(false); setEditing(null); }}
