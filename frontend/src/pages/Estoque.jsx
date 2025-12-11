@@ -1,92 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
+import { api } from "../api";
 
-// MOCK sem backend
-const mockDB = [
-  { id: 1, produto: "Arroz", quantidade: 10, categoria: "Alimentos" },
-  { id: 2, produto: "Sabão", quantidade: 5, categoria: "Limpeza" }
-];
-
-const api = {
-  list: async () => mockDB,
-  create: async (entity, item) => {
-    item.id = mockDB.length + 1;
-    mockDB.push(item);
-  },
-  update: async (entity, id, item) => {
-    const idx = mockDB.findIndex((i) => i.id === id);
-    if (idx !== -1) mockDB[idx] = { ...mockDB[idx], ...item };
-  },
-  remove: async (entity, id) => {
-    const idx = mockDB.findIndex((i) => i.id === id);
-    if (idx !== -1) mockDB.splice(idx, 1);
-  }
-};
-
-// ================= FORM ==================
-function Form({ initial = {}, onCancel, onSave }) {
-  const empty = { produto: "", quantidade: 0, categoria: "" };
-
-  const [f, setF] = useState({ ...empty, ...initial });
-
-  useEffect(() => {
-    setF({ ...empty, ...initial });
-  }, [initial]);
-
-  function change(e) {
-    const { name, value } = e.target;
-    setF((p) => ({ ...p, [name]: value }));
-  }
-
-  function submit(e) {
-    e.preventDefault();
-    if (!f.produto) return alert("Informe o nome do produto!");
-
-    onSave(f);
-  }
-
-  return (
-    <div className="modal">
-      <form className="modal-card" onSubmit={submit}>
-        <h3>{initial.id ? "Editar Produto" : "Novo Produto"}</h3>
-
-        <label>Produto
-          <input
-            name="produto"
-            value={f.produto}
-            onChange={change}
-            required
-          />
-        </label>
-
-        <label>Quantidade
-          <input
-            name="quantidade"
-            type="number"
-            min="0"
-            value={f.quantidade}
-            onChange={change}
-          />
-        </label>
-
-        <label>Categoria
-          <input
-            name="categoria"
-            value={f.categoria}
-            onChange={change}
-            placeholder="Ex: Alimentos, Limpeza..."
-          />
-        </label>
-
-        <div className="modal-actions">
-          <button type="button" onClick={onCancel}>Cancelar</button>
-          <button type="submit">Salvar</button>
-        </div>
-      </form>
-    </div>
-  );
-}
-
-// ================= ESTOQUE ==================
 export default function Estoque() {
   const userIsAdmin = true;
 
@@ -95,11 +9,17 @@ export default function Estoque() {
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState(null);
 
-
   const load = useCallback(async () => {
     setLoading(true);
-    const data = await api.list("estoque");
-    setItems([...data]);
+
+    try {
+      const data = await api.list("estoque");
+      setItems(data || []);
+    } catch (err) {
+      console.error("Erro ao carregar estoque:", err);
+      alert("Erro ao carregar estoque. Veja o console.");
+    }
+
     setLoading(false);
   }, []);
 
@@ -107,33 +27,47 @@ export default function Estoque() {
     load();
   }, [load]);
 
-
-
   async function handleSave(payload) {
-    if (payload.id) await api.update("estoque", payload.id, payload);
-    else await api.create("estoque", payload);
+    try {
+      if (payload.id) {
+        await api.update("estoque", payload.id, payload);
+      } else {
+        await api.create("estoque", payload);
+      }
 
-    setShowForm(false);
-    setEditing(null);
-    load();
+      setShowForm(false);
+      setEditing(null);
+      load();
+    } catch (e) {
+      console.error("Erro ao salvar:", e);
+      alert("Erro ao salvar o produto.");
+    }
   }
-
 
   async function handleDelete(id) {
     if (!confirm("Confirmar exclusão?")) return;
-    await api.remove("estoque", id);
-    load();
-  }
 
+    try {
+      await api.remove("estoque", id);
+      load();
+    } catch (e) {
+      console.error("Erro ao remover:", e);
+      alert("Erro ao remover produto.");
+    }
+  }
 
   return (
     <div>
       <h1>Estoque / Produtos</h1>
 
       <div className="content-container">
-
         {userIsAdmin && (
-          <button onClick={() => { setEditing(null); setShowForm(true); }}>
+          <button
+            onClick={() => {
+              setEditing(null);
+              setShowForm(true);
+            }}
+          >
             + Adicionar Produto
           </button>
         )}
@@ -152,8 +86,6 @@ export default function Estoque() {
             </thead>
 
             <tbody>
-              
-
               {items.map((it) => (
                 <tr key={it.id}>
                   <td>{it.produto}</td>
@@ -170,7 +102,11 @@ export default function Estoque() {
                     </button>
 
                     <button
-                      style={{ marginLeft: 10, backgroundColor: "#c0392b", color: "white" }}
+                      style={{
+                        marginLeft: 10,
+                        backgroundColor: "#c0392b",
+                        color: "white",
+                      }}
                       onClick={() => handleDelete(it.id)}
                     >
                       Excluir
@@ -192,10 +128,76 @@ export default function Estoque() {
       {showForm && (
         <Form
           initial={editing || {}}
-          onCancel={() => { setShowForm(false); setEditing(null); }}
+          onCancel={() => {
+            setShowForm(false);
+            setEditing(null);
+          }}
           onSave={handleSave}
         />
       )}
+    </div>
+  );
+}
+
+//
+// ============= FORM CORRIGIDO =================
+//
+function Form({ initial = {}, onCancel, onSave }) {
+  const empty = { produto: "", quantidade: 0, categoria: "" };
+  const [f, setF] = useState({ ...empty, ...initial });
+
+  useEffect(() => {
+    setF({ ...empty, ...initial });
+  }, [initial]);
+
+  function change(e) {
+    const { name, value } = e.target;
+    setF((p) => ({ ...p, [name]: value }));
+  }
+
+  function submit(e) {
+    e.preventDefault();
+    if (!f.produto.trim()) return alert("Informe o nome do produto!");
+    onSave(f);
+  }
+
+  return (
+    <div className="modal">
+      <form className="modal-card" onSubmit={submit}>
+        <h3>{initial.id ? "Editar Produto" : "Novo Produto"}</h3>
+
+        <label>
+          Produto
+          <input name="produto" value={f.produto} onChange={change} />
+        </label>
+
+        <label>
+          Quantidade
+          <input
+            name="quantidade"
+            type="number"
+            value={f.quantidade}
+            onChange={change}
+          />
+        </label>
+
+        <label>
+          Categoria
+          <input
+            name="categoria"
+            value={f.categoria}
+            onChange={change}
+            placeholder="Ex: Alimentos, Higiene, etc"
+          />
+        </label>
+
+        <div className="modal-actions">
+          <button type="button" onClick={onCancel}>
+            Cancelar
+          </button>
+          <button type="submit">Salvar</button>
+        </div>
+      </form>
     </div>
   );
 }
