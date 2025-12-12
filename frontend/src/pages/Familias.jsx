@@ -93,7 +93,7 @@ export default function Familias() {
     const [form, setForm] = useState(initial);
     useEffect(() => setForm(initial), [initial]);
 
-    // 🔹 Máscara de telefone
+
     function maskPhone(value) {
       const numbers = value.replace(/\D/g, "");
 
@@ -190,11 +190,11 @@ export default function Familias() {
           <table className="tabela">
             <thead>
               <tr>
-                <th>Responsável</th>
-                <th>Endereço</th>
-                <th>Contato</th>
-                <th>Integrantes</th>
-                {isAdmin && <th>Ações</th>}
+                <th style={{ textAlign: "left" }}>Responsável</th>
+                <th style={{ textAlign: "left" }}>Endereço</th>
+                <th style={{ textAlign: "left" }}>Contato</th>
+                <th style={{ textAlign: "left" }}>Integrantes</th>
+                {isAdmin && <th style={{ textAlign: "left" }}>Ações</th>}
               </tr>
             </thead>
 
@@ -211,13 +211,13 @@ export default function Familias() {
 
                 return (
                   <tr key={key}>
-                    <td>{it.nome_responsavel}</td>
-                    <td>{it.endereco}</td>
-                    <td>{it.contato}</td>
-                    <td>{it.n_integrantes}</td>
+                    <td style={{ textAlign: "left" }}>{it.nome_responsavel}</td>
+                    <td style={{ textAlign: "left" }}>{it.endereco}</td>
+                    <td style={{ textAlign: "left" }}>{it.contato}</td>
+                    <td style={{ textAlign: "left" }}>{it.n_integrantes}</td>
 
                     {isAdmin && (
-                      <td>
+                      <td style={{ textAlign: "left" }}>
                         <button onClick={() => { setEditing(it); setShowForm(true); }}>
                           Editar
                         </button>

@@ -6,8 +6,8 @@ CREATE TABLE IF NOT EXISTS usuarios (
     matricula VARCHAR(20),
     setor VARCHAR(100),
     data_ingresso DATE,
-    data_saida DATE,  -- Necessário para Inativação Lógica (deleteVoluntario)
-    tipo ENUM('admin', 'voluntario') DEFAULT 'voluntario', -- Necessário para Permissões
+    data_saida DATE,
+    tipo ENUM('admin', 'voluntario') DEFAULT 'voluntario',
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
